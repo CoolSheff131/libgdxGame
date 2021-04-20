@@ -24,6 +24,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.mygdx.game.cards.BuildingCardActor;
+import com.mygdx.game.cards.BuildingCardTypes;
+import com.mygdx.game.cards.CardActor;
+import com.mygdx.game.cards.resource.ResourceCardActor;
+import com.mygdx.game.cards.resource.SchemeCardActor;
+import com.mygdx.game.cards.resource.WorkerCardActor;
 
 import java.util.ArrayList;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
@@ -38,7 +44,8 @@ public class MotherBoardCard extends ApplicationAdapter {
 	int count=0;
 
 	DragAndDrop dragAndDropField,dragAndDropWorkshop;
-	Skin skin;
+	public static Skin skin;
+
 	OrthographicCamera camera;
 	int WIDTH_SCREEN, HEIGHT_SCREEN;
 	final int FIELD_SIZE = 5
@@ -52,8 +59,14 @@ public class MotherBoardCard extends ApplicationAdapter {
 	Group hand,info;
 	Table field;
 	Group workshop;
+	ArrayList<BuildingCardActor> cards;
 	@Override
 	public void create () {
+		skin = new Skin();
+		skin.add("badlogic", new Texture("heart.png"));
+		skin.add("res", new Texture("resourceTest.png"));
+		skin.add("scheme", new Texture("schemeTest.png"));
+		skin.add("worker", new Texture("workerTest.png"));
 		WIDTH_SCREEN =Gdx.graphics.getWidth();
 		HEIGHT_SCREEN =Gdx.graphics.getHeight();
 		HEIGHT_HAND= HEIGHT_SCREEN /6;
@@ -69,12 +82,10 @@ public class MotherBoardCard extends ApplicationAdapter {
 		ExtendViewport viewp = new ExtendViewport(WIDTH_SCREEN, HEIGHT_SCREEN,camera);
 		stage = new Stage(viewp);
 		Gdx.input.setInputProcessor(stage);//Добавляем обработку нажатии stage
+		cards = new ArrayList<>();
 
 
 
-		skin = new Skin();
-		skin.add("default", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-		skin.add("badlogic", new Texture("heart.png"));
 		dragAndDropField = new DragAndDrop();
 		dragAndDropWorkshop = new DragAndDrop();
 		TextureRegion textureRegion = new TextureRegion(new Texture("heart.png"));
@@ -160,10 +171,11 @@ public class MotherBoardCard extends ApplicationAdapter {
 				}
 			});
 		}
-		final ArrayList<Image> craftingCards = new ArrayList<>();
-		craftingCards.add(new Image(skin, "badlogic"));
-		craftingCards.add(new Image(skin, "badlogic"));
-		craftingCards.add(new Image(skin, "badlogic"));
+		final ArrayList<CardActor> craftingCards;
+		craftingCards = new ArrayList<>();
+		craftingCards.add(new ResourceCardActor());
+		craftingCards.add(new SchemeCardActor());
+		craftingCards.add(new WorkerCardActor());
 		Group craftingHand = new Group();
 		for (int i =0; i<craftingCards.size();i++) {
 			final Image craftingCard = craftingCards.get(i);
@@ -174,13 +186,20 @@ public class MotherBoardCard extends ApplicationAdapter {
 					payload.setObject(craftingCard);
 					payload.setDragActor(getActor());
 					craftingCards.remove(craftingCard);
+					System.out.println(craftingCards.size()+" crafting cards");
+					for (int c = 0;c<craftingCards.size();c++) {
+						//cards.get(c).setPosition(CARD_WIDTH * c,0);
+						craftingCards.get(c).addAction(moveTo(CARD_WIDTH * c,0,0.1f));
+					}
 					return payload;
 				}
 
 				@Override
 				public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
 					if(target==null) {
-						((Image) payload.getObject()).setPosition(0,0);//TODO сделать возвращение в руку карты
+						craftingCards.add(((CardActor) payload.getObject()));
+						((CardActor) payload.getObject()).addAction(moveTo(CARD_WIDTH*(craftingCards.size()-1),0,0.1f));
+
 						//cards.add(((Image) payload.getObject()));
 						//group.addActor((Image) payload.getObject());
 					}
@@ -251,14 +270,13 @@ public class MotherBoardCard extends ApplicationAdapter {
 	}
 
 	private Group makeHand() {
-		final ArrayList<Image> cards = new ArrayList<>();
-		cards.add(new Image(skin, "badlogic"));
-		cards.add(new Image(skin, "badlogic"));
-		cards.add(new Image(skin, "badlogic"));
+		cards.add(new BuildingCardActor(skin, "badlogic", BuildingCardTypes.WORKER_CARD));
+		cards.add(new BuildingCardActor(skin, "badlogic", BuildingCardTypes.WORKER_CARD));
+		cards.add(new BuildingCardActor(skin, "badlogic", BuildingCardTypes.WORKER_CARD));
 		final Group group = new Group();
 
 		for (int i =0; i<cards.size();i++) {
-			final Image card = cards.get(i);
+			final BuildingCardActor card = cards.get(i);
 			dragAndDropField.addSource(new DragAndDrop.Source(card) {
 				@Null
 				public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
@@ -267,6 +285,11 @@ public class MotherBoardCard extends ApplicationAdapter {
 
 					payload.setDragActor(getActor());
                     cards.remove(card);
+					System.out.println(cards.size());
+					for (int c = 0;c<cards.size();c++) {
+						//cards.get(c).setPosition(CARD_WIDTH * c,0);
+						cards.get(c).addAction(moveTo(CARD_WIDTH * c,0,0.1f));
+					}
 					//Label validLabel = new Label("Some payload!", skin);
 					//validLabel.setColor(0, 1, 0, 1);
 					//payload.setValidDragActor(validLabel);
@@ -281,10 +304,13 @@ public class MotherBoardCard extends ApplicationAdapter {
 				@Override
 				public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
 					if(target==null) {
-						((Image) payload.getObject()).setPosition(0,0);//TODO сделать возвращение в руку карты
+						cards.add(((BuildingCardActor) payload.getObject()));
+						//((BuildingCardActor) payload.getObject()).setPosition(CARD_WIDTH*(cards.size()-1),0);
+						((BuildingCardActor) payload.getObject()).addAction(moveTo(CARD_WIDTH*(cards.size()-1),0,0.1f));
 					    //cards.add(((Image) payload.getObject()));
                         //group.addActor((Image) payload.getObject());
                     }
+
 				}
 			});
 
@@ -301,13 +327,15 @@ public class MotherBoardCard extends ApplicationAdapter {
 
 		Table table = new Table();
 
-		Image[][] cells = new Image[FIELD_SIZE][FIELD_SIZE];//TODO добавить новый класс клетка???
+		final CellFieldActor[][] cells = new CellFieldActor[FIELD_SIZE][FIELD_SIZE];//TODO добавить новый класс клетка???
 		for (int i = 0; i < cells.length ; i++) {
 			for (int j = 0; j <cells[i].length ; j++) {
-				cells[i][j] = new Image(skin, "badlogic");//TODO добавить текстуру клетки поля
+				cells[i][j] = new CellFieldActor(skin, "badlogic");//TODO добавить текстуру клетки поля
 				cells[i][j].setSize(CELL_WIDTH,CELL_WIDTH);
 				table.add(cells[i][j]).size(HEIGH_FIELD/ FIELD_SIZE,HEIGH_FIELD/ FIELD_SIZE);
-				dragAndDropField.addTarget(new DragAndDrop.Target(cells[i][j]) {
+				final int finalI = i;
+				final int finalJ = j;
+				dragAndDropField.addTarget(new DragAndDrop.Target(cells[finalI][finalJ]) {
 					public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
 						getActor().setColor(Color.GREEN);
 						return true;
@@ -318,7 +346,10 @@ public class MotherBoardCard extends ApplicationAdapter {
 					}
 
 					public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-						System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);
+						cells[finalI][finalJ].setBuildingCardActor((BuildingCardActor) payload.getObject());//TODO убрать из клетки
+						System.out.println(cells[finalI][finalJ].getBuildingCardActor());
+						System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);//TODO убрать карту
+						
 					}
 				});
 			}

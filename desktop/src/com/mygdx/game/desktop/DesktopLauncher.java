@@ -5,7 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.game.MotherBoardCard;
 
 public class DesktopLauncher {
-	public static final int WIDTH=1920,HEIGHT=1280;
+	public static final int WIDTH=1280,HEIGHT=720;
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "MotherBoardCard";
