@@ -8,13 +8,14 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -24,78 +25,54 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.mygdx.game.cards.BuildingCardActor;
-import com.mygdx.game.cards.BuildingCardTypes;
+import com.mygdx.game.cards.buildings.BuildingCardActor;
 import com.mygdx.game.cards.CardActor;
-import com.mygdx.game.cards.resource.ResourceCardActor;
-import com.mygdx.game.cards.resource.SchemeCardActor;
-import com.mygdx.game.cards.resource.WorkerCardActor;
+import com.mygdx.game.cards.buildings.BuildingCardTypes;
+import com.mygdx.game.cards.buildings.EnergyBuildingCardActor;
+import com.mygdx.game.cards.buildings.StorageBuildingCardActor;
+import com.mygdx.game.cards.FactoryCard;
+import com.mygdx.game.cards.resource.ResourceCardTypes;
 
 import java.util.ArrayList;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 public class MotherBoardCard extends ApplicationAdapter {
-	SpriteBatch batch;
-//	Texture texture, texture2;
-//	Image image,image2;
-	Stage stage;
-	ImageButton toWorkshop;
-	Label label;
-	int count=0;
-
-	DragAndDrop dragAndDropField,dragAndDropWorkshop;
-	public static Skin skin;
-
-	OrthographicCamera camera;
-	int WIDTH_SCREEN, HEIGHT_SCREEN;
-	final int FIELD_SIZE = 5
-			,CRAFTING_SIZE = 3;
-	int HEIGHT_HAND,HEIGH_FIELD,HEIGHT_INFO,PADDING=20,WIDTH_BUTTON,WIDTH_HAND;
-	boolean inFields;
-	final int CARD_WIDTH = 200
-			,CELL_WIDTH = 100;
-	ShapeRenderer shapeRenderer;
-	ImageButton toFields;
-	Group hand,info;
-	Table field;
-	Group workshop;
-	ArrayList<BuildingCardActor> cards;
+ 	public static Skin skin;
+	private Stage stage;
+	private ImageButton toWorkshopBtn, endTurnBtn,craftBtn, toFields;
+	private Label label;
+	private DragAndDrop dragAndDropField,dragAndDropWorkshop;
+	private Group fieldGroup, workshop;
+	private OrthographicCamera camera;
+	private int count=0, WIDTH_SCREEN, HEIGHT_SCREEN, HEIGHT_HAND,HEIGH_FIELD,HEIGHT_INFO,PADDING=20,WIDTH_BUTTON,WIDTH_HAND, CARD_WIDTH,CELL_WIDTH = 100;
+	private final int FIELD_SIZE = 5,CRAFTING_SIZE = 3;
+	private boolean inFields;
+	private ShapeRenderer shapeRenderer;
+	private Group info;
+	private Table field;
+	private ArrayList<BuildingCardActor> cards;
+	private Container<Image>  craftingRes;
+	private final ArrayList<CardActor> craftingCards = new ArrayList<>();
 	@Override
 	public void create () {
-		skin = new Skin();
-		skin.add("badlogic", new Texture("heart.png"));
-		skin.add("res", new Texture("resourceTest.png"));
-		skin.add("scheme", new Texture("schemeTest.png"));
-		skin.add("worker", new Texture("workerTest.png"));
-		WIDTH_SCREEN =Gdx.graphics.getWidth();
-		HEIGHT_SCREEN =Gdx.graphics.getHeight();
-		HEIGHT_HAND= HEIGHT_SCREEN /6;
-		HEIGH_FIELD= HEIGHT_SCREEN /3*2;
-		HEIGHT_INFO= HEIGHT_SCREEN /10;
-		PADDING=20;
-		WIDTH_BUTTON = WIDTH_SCREEN /9;
-		WIDTH_HAND= WIDTH_SCREEN /9*8;
-		inFields=true;
-		camera = new OrthographicCamera();
-		camera.position.set(WIDTH_SCREEN / 2, HEIGHT_SCREEN / 2, 0);
+		init();
 
-		ExtendViewport viewp = new ExtendViewport(WIDTH_SCREEN, HEIGHT_SCREEN,camera);
-		stage = new Stage(viewp);
-		Gdx.input.setInputProcessor(stage);//Добавляем обработку нажатии stage
-		cards = new ArrayList<>();
+		setBtnListeners();
 
+		//label = new Label("You pressed this button "+count+" times",new Label.LabelStyle(new BitmapFont(),Color.BROWN));
 
+		setActorsBounds();
 
-		dragAndDropField = new DragAndDrop();
-		dragAndDropWorkshop = new DragAndDrop();
-		TextureRegion textureRegion = new TextureRegion(new Texture("heart.png"));
-		TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(textureRegion);
-		toWorkshop = new ImageButton(textureRegionDrawable);
+		stage.addActor(fieldGroup);
 
-		toWorkshop.setSize(WIDTH_BUTTON,WIDTH_BUTTON);
+		stage.addActor(toWorkshopBtn);
+		stage.addActor(toFields);
+		stage.addActor(workshop);
+		fieldGroup.addActor(field);
+		fieldGroup.addActor(endTurnBtn);
 
-		toFields = new ImageButton(textureRegionDrawable);
-		toFields.setSize(WIDTH_BUTTON,WIDTH_BUTTON);
+	}
+	private void setBtnListeners(){
 		toFields.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -103,12 +80,26 @@ public class MotherBoardCard extends ApplicationAdapter {
 				count++;
 				field.setDebug(!field.getDebug());
 				//label.setText("You pressed this button "+count+" times");
-				//camera.position.set(WIDTH_SCREEN / 2, HEIGHT_SCREEN / 2, 0);
-
 				return super.touchDown(event, x, y, pointer, button);
 			}
 		});
-		toWorkshop.addListener(new InputListener(){
+		endTurnBtn.addListener(new InputListener(){
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				System.out.println("END TURN");
+				//TODO добавить завершение хода
+				return super.touchDown(event, x, y, pointer, button);
+			}
+		});
+		craftBtn.addListener(new InputListener(){
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				System.out.println("CRAFT!");
+				addBuildingCardToHand(FactoryCard.createCard(BuildingCardTypes.STORAGE));//TODO Добавить крафт
+				return super.touchDown(event, x, y, pointer, button);
+			}
+		});
+		toWorkshopBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				System.out.println("Нажато");
@@ -117,43 +108,75 @@ public class MotherBoardCard extends ApplicationAdapter {
 				//label.setText("You pressed this button "+count+" times");
 				//camera.position.set(-WIDTH_SCREEN / 2, HEIGHT_SCREEN / 2, 0);
 				if(inFields){
-					field.addAction(moveBy(WIDTH_SCREEN,0,1f));
+					fieldGroup.addAction(moveBy(WIDTH_SCREEN,0,1f));
 					workshop.addAction(moveBy(WIDTH_SCREEN,0,1f));
 					inFields = !inFields;
 				}
 				else{
-					field.addAction(moveBy(-WIDTH_SCREEN,0,1f));
+					fieldGroup.addAction(moveBy(-WIDTH_SCREEN,0,1f));
 					workshop.addAction(moveBy(-WIDTH_SCREEN,0,1f));
 					inFields = !inFields;
 				}
 				return super.touchDown(event, x, y, pointer, button);
 			}
 		});
-
-		//label = new Label("You pressed this button "+count+" times",new Label.LabelStyle(new BitmapFont(),Color.BROWN));
+	}
+	private void init(){
+		skin = new Skin();
+		skin.add("badlogic", new Texture("heart.png"));
+		skin.add("res", new Texture("resourceTest.png"));
+		skin.add("scheme", new Texture("schemeTest.png"));
+		skin.add("worker", new Texture("workerTest.png"));
+		skin.add("en", new Texture("EnergyTest.png"));
+		skin.add("stor", new Texture("StorageTest.png"));
+		WIDTH_SCREEN = Gdx.graphics.getWidth();
+		HEIGHT_SCREEN = Gdx.graphics.getHeight();
+		HEIGHT_HAND = HEIGHT_SCREEN /6;
+		HEIGH_FIELD = HEIGHT_SCREEN /3*2;
+		HEIGHT_INFO = HEIGHT_SCREEN /10;
+		PADDING = 20;
+		WIDTH_BUTTON = WIDTH_SCREEN /9;
+		WIDTH_HAND = WIDTH_SCREEN /9*8;
+		CARD_WIDTH = WIDTH_SCREEN/10;
+		inFields = true;
+		camera = new OrthographicCamera();
+		camera.position.set(WIDTH_SCREEN / 2, HEIGHT_SCREEN / 2, 0);
+		ExtendViewport viewp = new ExtendViewport(WIDTH_SCREEN, HEIGHT_SCREEN,camera);
+		stage = new Stage(viewp);
+		Gdx.input.setInputProcessor(stage);//Добавляем обработку нажатии stage
+		cards = new ArrayList<>();
+		dragAndDropField = new DragAndDrop();
+		dragAndDropWorkshop = new DragAndDrop();
+		TextureRegion textureRegion = new TextureRegion(new Texture("heart.png"));
+		TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(textureRegion);
+		toWorkshopBtn = new ImageButton(textureRegionDrawable);
+		endTurnBtn = new ImageButton(textureRegionDrawable);
+		craftBtn = new ImageButton(textureRegionDrawable);
+		toFields = new ImageButton(textureRegionDrawable);
+		shapeRenderer = new ShapeRenderer();
+		fieldGroup = new Group();
 
 		stage.getBatch().setProjectionMatrix(stage.getCamera().combined);
 		stage.getViewport().apply();
-
 		field = makeField();
-//		field.setPosition(Gdx.graphics.getWidth()/3-field.getWidth()/2,Gdx.graphics.getHeight()*2/3-field.getHeight()/2);
-		hand = makeHand();
+		makeHand();
 		info = makeInfo();
-		workshop = makeWorkshop();
-		placeObejcts();
-		stage.addActor(field);
-		stage.addActor(hand);
-		stage.addActor(toWorkshop);
-		stage.addActor(toFields);
-		stage.addActor(workshop);
-		shapeRenderer = new ShapeRenderer();
+		workshop = new Group();
+		makeWorkshop();
 	}
+	private void addcraftingcard(CardActor cardActor){
+		dragAndDropWorkshop.addSource(new CraftingCardSource(cardActor));
+		workshop.addActor(cardActor);
+		craftingCards.add(cardActor);
+		cardActor.setBounds(CARD_WIDTH * (craftingCards.size() - 1),0,CARD_WIDTH,CARD_WIDTH);
+	}
+	private void makeWorkshop() {
 
-	private Group makeWorkshop() {
-		Group workshopGroup = new Group();
+
+		//Создание поле крафта
 		Table craftingTable = new Table();
-		Image[] craftingCells = new Image[CRAFTING_SIZE];//TODO добавить новый класс клетка крафта???
-		for (int i = 0; i <craftingCells.length ; i++) {
+		Image[] craftingCells = new Image[CRAFTING_SIZE];
+		for (int i = 0; i < craftingCells.length ; i++) {//todo создать отдельный класс?? где будет проверяться содержимое клеток и правильность собраной комбинации
 			craftingCells[i] = new Image(skin, "badlogic");//TODO добавить текстуру клетки крафта
 			craftingTable.add(craftingCells[i]);
 			dragAndDropWorkshop.addTarget(new DragAndDrop.Target(craftingCells[i]) {
@@ -167,59 +190,99 @@ public class MotherBoardCard extends ApplicationAdapter {
 				}
 
 				public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-					System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);
+					System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);//TODo магнитить к клетке
 				}
 			});
 		}
-		final ArrayList<CardActor> craftingCards;
-		craftingCards = new ArrayList<>();
-		craftingCards.add(new ResourceCardActor());
-		craftingCards.add(new SchemeCardActor());
-		craftingCards.add(new WorkerCardActor());
-		Group craftingHand = new Group();
-		for (int i =0; i<craftingCards.size();i++) {
-			final Image craftingCard = craftingCards.get(i);
-			DragAndDrop.Source source = new DragAndDrop.Source(craftingCard) {
-				@Null
-				public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
-					DragAndDrop.Payload payload = new DragAndDrop.Payload();
-					payload.setObject(craftingCard);
-					payload.setDragActor(getActor());
-					craftingCards.remove(craftingCard);
-					System.out.println(craftingCards.size()+" crafting cards");
-					for (int c = 0;c<craftingCards.size();c++) {
-						//cards.get(c).setPosition(CARD_WIDTH * c,0);
-						craftingCards.get(c).addAction(moveTo(CARD_WIDTH * c,0,0.1f));
-					}
-					return payload;
-				}
 
-				@Override
-				public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-					if(target==null) {
-						craftingCards.add(((CardActor) payload.getObject()));
-						((CardActor) payload.getObject()).addAction(moveTo(CARD_WIDTH*(craftingCards.size()-1),0,0.1f));
+		//Добавление карт в руку
 
-						//cards.add(((Image) payload.getObject()));
-						//group.addActor((Image) payload.getObject());
-					}
-				}
-			};
-
-			dragAndDropWorkshop.addSource(source);
-
-			craftingCard.setBounds(CARD_WIDTH * i,0,CARD_WIDTH,CARD_WIDTH);
-			craftingHand.addActor(craftingCard);
-
+		for (int i =0; i<4;i++) {
+			addcraftingcard(FactoryCard.createCard(ResourceCardTypes.RESOURSE_CARD));
 		}
-		dragAndDropWorkshop.setDragActorPosition(100, -300);
+		dragAndDropWorkshop.setDragActorPosition(craftingCards.get(0).getWidth()/2, -craftingCards.get(0).getHeight()*3/2);
 		craftingTable.setDebug(true);
 
-		workshopGroup.addActor(craftingTable);
-		craftingTable.setBounds(0,HEIGH_FIELD/3,WIDTH_SCREEN,HEIGH_FIELD/3*2);
-		craftingHand.setSize(WIDTH_SCREEN,HEIGH_FIELD/3);
-		workshopGroup.addActor(craftingHand);
-		return workshopGroup;
+		craftingRes = new Container<>();
+		workshop.addActor(craftingTable);
+		workshop.addActor(craftBtn);
+		workshop.addActor(craftingRes);
+		craftBtn.setBounds(0,HEIGH_FIELD/3,WIDTH_SCREEN/4,HEIGH_FIELD/3*2);
+		craftingTable.setBounds(WIDTH_SCREEN/4,HEIGH_FIELD/3,WIDTH_SCREEN/4*2,HEIGH_FIELD/3*2);
+		craftingRes.setBounds(WIDTH_SCREEN/4*3,HEIGH_FIELD/3,WIDTH_SCREEN/4,HEIGH_FIELD/3*2);
+	}
+	private class CraftingCardSource extends DragAndDrop.Source{
+
+		public CraftingCardSource(Actor actor) {
+			super(actor);
+		}
+
+		@Override
+		public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+			DragAndDrop.Payload payload = new DragAndDrop.Payload();
+			payload.setObject(getActor());
+			payload.setDragActor(getActor());
+			craftingCards.remove(getActor());
+			System.out.println(craftingCards.size()+" crafting cards");
+			for (int c = 0;c<craftingCards.size();c++) {
+				craftingCards.get(c).addAction(moveTo(CARD_WIDTH * c,0,0.1f));
+			}
+			return payload;
+		}
+		@Override
+		public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
+			if(target==null) {
+
+				craftingCards.add(((CardActor) payload.getObject()));
+				((CardActor) payload.getObject()).addAction(moveTo(CARD_WIDTH*(craftingCards.size()-1),0,0.1f));
+				//cards.add(((Image) payload.getObject()));
+				//group.addActor((Image) payload.getObject());
+			}else{
+				//((CardActor) payload.getObject()).addAction(moveTo(target.getActor().getX(),target.getActor().getOriginY(),0.1f));TODO привязать к клетке
+			}
+		}
+
+	}
+	private class FieldCardSource extends  DragAndDrop.Source{
+
+		public FieldCardSource(Actor actor) {
+			super(actor);
+		}
+
+		@Null
+		public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
+			DragAndDrop.Payload payload = new DragAndDrop.Payload();
+			payload.setObject(getActor());
+
+			payload.setDragActor(getActor());
+			cards.remove(getActor());
+			System.out.println(cards.size());
+			for (int c = 0;c<cards.size();c++) {
+				//cards.get(c).setPosition(CARD_WIDTH * c,0);
+				cards.get(c).addAction(moveTo(WIDTH_BUTTON+PADDING+CARD_WIDTH * c,0,0.1f));
+			}
+			//Label validLabel = new Label("Some payload!", skin);
+			//validLabel.setColor(0, 1, 0, 1);
+			//payload.setValidDragActor(validLabel);
+
+			//Label invalidLabel = new Label("Some payload!", skin);
+			//invalidLabel.setColor(1, 0, 0, 1);
+			//payload.setInvalidDragActor(invalidLabel);
+
+			return payload;
+		}
+
+		@Override
+		public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
+			if(target==null) {
+				cards.add(((BuildingCardActor) payload.getObject()));
+				//((BuildingCardActor) payload.getObject()).setPosition(CARD_WIDTH*(cards.size()-1),0);
+				((BuildingCardActor) payload.getObject()).addAction(moveTo(WIDTH_BUTTON+PADDING+CARD_WIDTH*(cards.size()-1),0,0.1f));
+				//cards.add(((Image) payload.getObject()));
+				//group.addActor((Image) payload.getObject());
+			}
+
+		}
 	}
 
 	private Group makeInfo() {
@@ -229,13 +292,15 @@ public class MotherBoardCard extends ApplicationAdapter {
 		return group;
 	}
 
-	private void placeObejcts(){
-		toWorkshop.setBounds(0,0,WIDTH_BUTTON,HEIGHT_HAND);
-		hand.setBounds(WIDTH_BUTTON+PADDING,0,WIDTH_HAND,HEIGHT_HAND);
-		field.setBounds(0,HEIGHT_HAND+PADDING, WIDTH_SCREEN,HEIGH_FIELD);
+	private void setActorsBounds(){
+		field.setBounds(0,0, WIDTH_SCREEN/3*2,HEIGH_FIELD);
+		toWorkshopBtn.setBounds(0,0,WIDTH_BUTTON,HEIGHT_HAND);
+
+		fieldGroup.setBounds(0,HEIGHT_HAND+PADDING, WIDTH_SCREEN,HEIGH_FIELD);
 		info.setBounds(0,HEIGHT_HAND+PADDING+HEIGH_FIELD+PADDING, WIDTH_SCREEN,HEIGHT_INFO);
-		toFields.setBounds(-WIDTH_SCREEN,0,WIDTH_BUTTON,HEIGHT_HAND);
 		workshop.setBounds(-WIDTH_SCREEN,HEIGHT_HAND+PADDING, WIDTH_SCREEN,HEIGH_FIELD);
+		toFields.setBounds(-WIDTH_SCREEN,0,WIDTH_BUTTON,HEIGHT_HAND);
+		endTurnBtn.setBounds(WIDTH_SCREEN/3*2,0,WIDTH_SCREEN/3,HEIGH_FIELD);
 	}
 
 	private void handleInput() {
@@ -269,65 +334,24 @@ public class MotherBoardCard extends ApplicationAdapter {
 		}
 	}
 
-	private Group makeHand() {
-		cards.add(new BuildingCardActor(skin, "badlogic", BuildingCardTypes.WORKER_CARD));
-		cards.add(new BuildingCardActor(skin, "badlogic", BuildingCardTypes.WORKER_CARD));
-		cards.add(new BuildingCardActor(skin, "badlogic", BuildingCardTypes.WORKER_CARD));
-		final Group group = new Group();
-
-		for (int i =0; i<cards.size();i++) {
-			final BuildingCardActor card = cards.get(i);
-			dragAndDropField.addSource(new DragAndDrop.Source(card) {
-				@Null
-				public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
-					DragAndDrop.Payload payload = new DragAndDrop.Payload();
-					payload.setObject(card);
-
-					payload.setDragActor(getActor());
-                    cards.remove(card);
-					System.out.println(cards.size());
-					for (int c = 0;c<cards.size();c++) {
-						//cards.get(c).setPosition(CARD_WIDTH * c,0);
-						cards.get(c).addAction(moveTo(CARD_WIDTH * c,0,0.1f));
-					}
-					//Label validLabel = new Label("Some payload!", skin);
-					//validLabel.setColor(0, 1, 0, 1);
-					//payload.setValidDragActor(validLabel);
-
-					//Label invalidLabel = new Label("Some payload!", skin);
-					//invalidLabel.setColor(1, 0, 0, 1);
-					//payload.setInvalidDragActor(invalidLabel);
-
-					return payload;
-				}
-
-				@Override
-				public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-					if(target==null) {
-						cards.add(((BuildingCardActor) payload.getObject()));
-						//((BuildingCardActor) payload.getObject()).setPosition(CARD_WIDTH*(cards.size()-1),0);
-						((BuildingCardActor) payload.getObject()).addAction(moveTo(CARD_WIDTH*(cards.size()-1),0,0.1f));
-					    //cards.add(((Image) payload.getObject()));
-                        //group.addActor((Image) payload.getObject());
-                    }
-
-				}
-			});
-
-			card.setBounds(CARD_WIDTH * i,0,CARD_WIDTH,CARD_WIDTH);
-			group.addActor(card);
-			dragAndDropField.setDragActorPosition(card.getWidth() / 2-200, -card.getHeight() / 2+50);//TODO поставить курсор в центр карты
-
+	private void addBuildingCardToHand(BuildingCardActor buildingCardActor){
+		cards.add(buildingCardActor);
+		dragAndDropField.addSource(new FieldCardSource(buildingCardActor));
+		buildingCardActor.setBounds(WIDTH_BUTTON+PADDING+CARD_WIDTH * (cards.size() - 1),0,CARD_WIDTH,CARD_WIDTH);
+		stage.addActor(buildingCardActor);
+	}
+	private void makeHand() {
+		for (int i = 0; i < 3; i++) {
+			addBuildingCardToHand(FactoryCard.createCard(BuildingCardTypes.ENERGY));
 		}
-        return group;
-
+		dragAndDropField.setDragActorPosition(CARD_WIDTH / 2, -CARD_WIDTH/2 );
 	}
 
 	private Table makeField() {
 
 		Table table = new Table();
 
-		final CellFieldActor[][] cells = new CellFieldActor[FIELD_SIZE][FIELD_SIZE];//TODO добавить новый класс клетка???
+		final CellFieldActor[][] cells = new CellFieldActor[FIELD_SIZE][FIELD_SIZE];//TODO добавить новый класс клетка поля???
 		for (int i = 0; i < cells.length ; i++) {
 			for (int j = 0; j <cells[i].length ; j++) {
 				cells[i][j] = new CellFieldActor(skin, "badlogic");//TODO добавить текстуру клетки поля
@@ -346,9 +370,9 @@ public class MotherBoardCard extends ApplicationAdapter {
 					}
 
 					public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-						cells[finalI][finalJ].setBuildingCardActor((BuildingCardActor) payload.getObject());//TODO убрать из клетки
+						cells[finalI][finalJ].setBuildingCardActor((BuildingCardActor) payload.getObject());//TODO убрать из клетки постройку
 						System.out.println(cells[finalI][finalJ].getBuildingCardActor());
-						System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);//TODO убрать карту
+						System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);
 						
 					}
 				});

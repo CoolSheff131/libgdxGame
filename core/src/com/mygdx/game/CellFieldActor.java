@@ -2,7 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.mygdx.game.cards.BuildingCardActor;
+import com.mygdx.game.cards.buildings.BuildingCardActor;
 
 public class CellFieldActor extends Image {
     private BuildingCardActor buildingCardActor;
