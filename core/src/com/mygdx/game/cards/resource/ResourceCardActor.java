@@ -1,12 +1,10 @@
 package com.mygdx.game.cards.resource;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.mygdx.game.MotherBoardCard;
+import com.mygdx.game.Items;
 import com.mygdx.game.cards.CardActor;
 
 public class ResourceCardActor extends CardActor{
-    private ResourceCardTypes buildingCardTypes;
+    private Items buildingCardTypes;
     public ResourceCardActor(){
         super("res");
 
@@ -15,5 +13,10 @@ public class ResourceCardActor extends CardActor{
     @Override
     public String getDrawableName() {
         return "res";
+    }
+
+    @Override
+    public Items getItemType() {
+        return Items.RESOURSE_CARD;
     }
 }

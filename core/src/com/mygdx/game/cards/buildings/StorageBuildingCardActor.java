@@ -1,5 +1,6 @@
 package com.mygdx.game.cards.buildings;
 
+import com.mygdx.game.Items;
 import com.mygdx.game.cards.CardActor;
 
 public class StorageBuildingCardActor extends CardActor {
@@ -10,5 +11,10 @@ public class StorageBuildingCardActor extends CardActor {
     @Override
     public String getDrawableName() {
         return "stor";
+    }
+
+    @Override
+    public Items getItemType() {
+        return Items.STORAGE_BUILDING;
     }
 }
