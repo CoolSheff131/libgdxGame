@@ -6,4 +6,9 @@ public class SchemeCardActor extends CardActor {
     public SchemeCardActor() {
         super("scheme");
     }
+
+    @Override
+    public String getDrawableName() {
+        return "scheme";
+    }
 }

@@ -6,4 +6,9 @@ public class WorkerCardActor extends CardActor {
     public WorkerCardActor() {
         super("worker");
     }
+
+    @Override
+    public String getDrawableName() {
+        return "worker";
+    }
 }

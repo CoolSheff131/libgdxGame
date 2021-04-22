@@ -12,4 +12,8 @@ public class ResourceCardActor extends CardActor{
 
     }
 
+    @Override
+    public String getDrawableName() {
+        return "res";
+    }
 }
