@@ -1,10 +1,12 @@
 package com.mygdx.game.cards.resource;
 
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.mygdx.game.Items;
 import com.mygdx.game.cards.CardActor;
+import com.mygdx.game.cards.Factory;
 
 public class ResourceCardActor extends CardActor{
-    private Items buildingCardTypes;
+
     public ResourceCardActor(){
         super("res");
 

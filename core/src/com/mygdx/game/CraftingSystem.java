@@ -1,11 +1,9 @@
 package com.mygdx.game;
 
 import com.mygdx.game.cards.CardActor;
-import com.mygdx.game.cards.FactoryCard;
+import com.mygdx.game.cards.Factory;
 
 import java.util.ArrayList;
-
-import javax.smartcardio.Card;
 
 
 public class CraftingSystem {
@@ -31,7 +29,7 @@ public class CraftingSystem {
                 }
             }
          if (complete) {
-             return FactoryCard.createCard(recipe.getOut());
+             return Factory.createCard(recipe.getOut());
          }
         }
         return null;

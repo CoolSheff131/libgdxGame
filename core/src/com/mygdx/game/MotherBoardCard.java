@@ -23,85 +23,84 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.mygdx.game.cards.CardActor;
-import com.mygdx.game.cards.FactoryCard;
-
-import java.util.ArrayList;
+import com.mygdx.game.cards.Factory;
+import com.mygdx.game.cards.buildings.Building;
+import com.mygdx.game.cells.CellActor;
+import com.mygdx.game.cells.CraftingCellActor;
+import com.mygdx.game.cells.FieldCellActor;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 public class MotherBoardCard extends ApplicationAdapter {
  	public static Skin skin;
 	private Stage stage;
-	private ImageButton toWorkshopBtn, endTurnBtn,craftBtn, toFields;
-	private Label label;
-	private DragAndDrop dragAndDroptoField,dragAndDropWorkshop, dragAndDropToHand, DADToWorkshopHand;
-	private Group fieldGroup, workshop;
+	private ImageButton toWorkshopBtn, endTurnBtn,craftBtn, debugBtn;
+	private Label turnLabel;
+	private Group fieldGroup, workshop, info;
 	private OrthographicCamera camera;
-	private int count=0, WIDTH_SCREEN, HEIGHT_SCREEN, HEIGHT_HAND,HEIGH_FIELD,HEIGHT_INFO,PADDING=20,WIDTH_BUTTON,WIDTH_HAND, CARD_WIDTH,CELL_WIDTH = 100;
+	public static int  WIDTH_SCREEN, HEIGHT_SCREEN, HEIGHT_HAND,HEIGH_FIELD,HEIGHT_INFO,PADDING=20,WIDTH_BUTTON,WIDTH_HAND, CARD_WIDTH,CELL_WIDTH = 100;
 	private final int FIELD_SIZE = 5,CRAFTING_SIZE = 3;
 	private boolean inFields;
 	private ShapeRenderer shapeRenderer;
-	private Group info;
 	private Table field;
-	private ArrayList<CardActor> cards;
 	private Container<Image>  craftingRes;
-	private final ArrayList<CardActor> craftingCards = new ArrayList<>();
-	private ArrayList<CardActor> cardsInCraftingSlots;
-	private final CellActor[] craftingCells = new CellActor[CRAFTING_SIZE];
+	private CellActor[] craftingCells = new CellActor[CRAFTING_SIZE];
+	private FieldCellActor[][] fieldCells;
+	public static int turn = 0;
 	@Override
 	public void create () {
 		init();
 		setBtnListeners();
-		//label = new Label("You pressed this button "+count+" times",new Label.LabelStyle(new BitmapFont(),Color.BROWN));
 		setActorsBounds();
+		stage.addActor(info);
 		stage.addActor(fieldGroup);
 		stage.addActor(toWorkshopBtn);
-		stage.addActor(toFields);
+		stage.addActor(debugBtn);
 		stage.addActor(workshop);
 		fieldGroup.addActor(field);
 		fieldGroup.addActor(endTurnBtn);
 
 	}
 	private void setBtnListeners(){
-		toFields.addListener(new InputListener(){
+		debugBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				System.out.println("Нажато");
-				count++;
 				field.setDebug(!field.getDebug());
-				//label.setText("You pressed this button "+count+" times");
 				return super.touchDown(event, x, y, pointer, button);
 			}
 		});
 		endTurnBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				System.out.println("END TURN");
-				//TODO добавить завершение хода
+				turn++;
+				for (FieldCellActor[] fieldRow: fieldCells) {
+					for(FieldCellActor fieldCell: fieldRow){
+						fieldCell.doEndTurnThing();		//todo отдельый класс который будет отвечать за добавление карт?
+					}
+				}
+				turnLabel.setText("Turn: "+turn);
 				return super.touchDown(event, x, y, pointer, button);
 			}
 		});
 		craftBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				CardActor res = CraftingSystem.GetRecipeOutput(cardsInCraftingSlots);
+				CardActor res = CraftingSystem.GetRecipeOutput(Singleton.getCardsInCraftingSlots());
 				if(res !=null){
 					System.out.println("CRAFT!");
 					clearCraftingCells();
-					addBuildingCardToHand(res);
-				}else System.out.println("WRONG");
+					Singleton.addBuildingCard(res);
+				}else {
+					System.out.println("WRONG");//todo показать игроку что неправильно собран крафт
+				}
 				return super.touchDown(event, x, y, pointer, button);
 			}
 		});
 		toWorkshopBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				System.out.println("Нажато");
-				count++;
-				field.setDebug(!field.getDebug());
 				if(inFields){
 					fieldGroup.addAction(moveBy(WIDTH_SCREEN,0,1f));
 					workshop.addAction(moveBy(WIDTH_SCREEN,0,1f));
@@ -137,56 +136,40 @@ public class MotherBoardCard extends ApplicationAdapter {
 		camera = new OrthographicCamera();
 		camera.position.set(WIDTH_SCREEN / 2, HEIGHT_SCREEN / 2, 0);
 		ExtendViewport viewp = new ExtendViewport(WIDTH_SCREEN, HEIGHT_SCREEN,camera);
-		stage = new Stage(viewp);
+		stage = Singleton.getStage();
 		Gdx.input.setInputProcessor(stage);//Добавляем обработку нажатии stage
-		cards = new ArrayList<>();
-		dragAndDroptoField = new DragAndDrop();
-		dragAndDropWorkshop = new DragAndDrop();
-		dragAndDropToHand = new DragAndDrop();
-		DADToWorkshopHand = new DragAndDrop();
+
 		TextureRegion textureRegion = new TextureRegion(new Texture("heart.png"));
 		TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(textureRegion);
 		toWorkshopBtn = new ImageButton(textureRegionDrawable);
 		endTurnBtn = new ImageButton(textureRegionDrawable);
 		craftBtn = new ImageButton(textureRegionDrawable);
-		toFields = new ImageButton(textureRegionDrawable);
+		debugBtn = new ImageButton(textureRegionDrawable);
 		shapeRenderer = new ShapeRenderer();
 		fieldGroup = new Group();
-
-		cardsInCraftingSlots = new ArrayList<>();
 
 		stage.getBatch().setProjectionMatrix(stage.getCamera().combined);
 		stage.getViewport().apply();
 		field = makeField();
 		makeHand();
 		info = makeInfo();
-		workshop = new Group();
+		workshop = Singleton.getWorkshop();
 		makeWorkshop();
 	}
-	private void addcraftingcard(CardActor cardActor){
-		dragAndDropWorkshop.addSource(new CraftingCardSource(cardActor));
-		workshop.addActor(cardActor);
-		craftingCards.add(cardActor);
-		cardActor.setBounds(CARD_WIDTH * (craftingCards.size() - 1),0,CARD_WIDTH,CARD_WIDTH);
-	}
+
 	private void makeWorkshop() {
 		Table craftingTable = new Table();//Создание поле крафта
-
 		for (int i = 0; i < craftingCells.length ; i++) {
-			craftingCells[i] = new CellActor(skin, "badlogic");
+			craftingCells[i] = new CraftingCellActor(skin, "badlogic");
 			craftingTable.add(craftingCells[i]);
-			dragAndDropWorkshop.addTarget(new WorkShopTarget(craftingCells[i]));
+			Singleton.getDADWorkshop().addTarget(Factory.createTarget(Factory.WORKSHOPTARGET,craftingCells[i]));
 		}
+		for (int i =0; i < 4;i++)	Singleton.addcraftingcard(Factory.createCard(Items.RESOURSE_CARD)); //Добавление карт в руку
+		Singleton.addcraftingcard(Factory.createCard(Items.SCHEME_CARD));
+		Singleton.addcraftingcard(Factory.createCard(Items.WORKER_CARD));
 
-		//Добавление карт в руку
-		for (int i =0; i<4;i++) {
-			addcraftingcard(FactoryCard.createCard(Items.RESOURSE_CARD));
-		}
-		addcraftingcard(FactoryCard.createCard(Items.SCHEME_CARD));
-		addcraftingcard(FactoryCard.createCard(Items.WORKER_CARD));
-		dragAndDropWorkshop.setDragActorPosition(craftingCards.get(0).getWidth()/2, -craftingCards.get(0).getHeight()*3/2);
+		Singleton.getDADWorkshop().setDragActorPosition(Singleton.getCraftingCards().get(0).getWidth()/2, -Singleton.getCraftingCards().get(0).getHeight()*3/2);
 		craftingTable.setDebug(true);
-
 		craftingRes = new Container<>();
 		workshop.addActor(craftingTable);
 		workshop.addActor(craftBtn);
@@ -195,181 +178,11 @@ public class MotherBoardCard extends ApplicationAdapter {
 		craftingTable.setBounds(WIDTH_SCREEN/4,HEIGH_FIELD/3,WIDTH_SCREEN/4*2,HEIGH_FIELD/3*2);
 		craftingRes.setBounds(WIDTH_SCREEN/4*3,HEIGH_FIELD/3,WIDTH_SCREEN/4,HEIGH_FIELD/3*2);
 	}
-	private class CraftingCardSource extends DragAndDrop.Source{
-
-		public CraftingCardSource(Actor actor) {
-			super(actor);
-		}
-
-		@Override
-		public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-			DragAndDrop.Payload payload = new DragAndDrop.Payload();
-			payload.setObject(getActor());
-			payload.setDragActor(getActor());
-			craftingCards.remove(getActor());
-			System.out.println(craftingCards.size()+" crafting cards");
-			for (int c = 0;c<craftingCards.size();c++) {
-				craftingCards.get(c).addAction(moveTo(CARD_WIDTH * c,0,0.1f));
-			}
-			return payload;
-		}
-		@Override
-		public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-			if(target==null) {
-				craftingCards.add(((CardActor) payload.getObject()));
-				((CardActor) payload.getObject()).addAction(moveTo(CARD_WIDTH*(craftingCards.size()-1),0,0.1f));
-			}
-		}
-
-	}
-	private class FieldCardSource extends  DragAndDrop.Source{
-
-		public FieldCardSource(Actor actor) {
-			super(actor);
-		}
-
-		@Null
-		public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
-			DragAndDrop.Payload payload = new DragAndDrop.Payload();
-			payload.setObject(getActor());
-			payload.setDragActor(getActor());
-			cards.remove(getActor());
-			System.out.println(cards.size());
-			for (int c = 0;c<cards.size();c++) {
-				//cards.get(c).setPosition(CARD_WIDTH * c,0);
-				cards.get(c).addAction(moveTo(WIDTH_BUTTON+PADDING+CARD_WIDTH * c,0,0.1f));
-			}
-			//Label validLabel = new Label("Some payload!", skin);
-			//validLabel.setColor(0, 1, 0, 1);
-			//payload.setValidDragActor(validLabel);
-
-			//Label invalidLabel = new Label("Some payload!", skin);
-			//invalidLabel.setColor(1, 0, 0, 1);
-			//payload.setInvalidDragActor(invalidLabel);
-
-			return payload;
-		}
-
-		@Override
-		public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-			if(target==null) {
-				cards.add(((CardActor) payload.getObject()));
-				//((BuildingCardActor) payload.getObject()).setPosition(CARD_WIDTH*(cards.size()-1),0);
-				((CardActor) payload.getObject()).addAction(moveTo(WIDTH_BUTTON+PADDING+CARD_WIDTH*(cards.size()-1),0,0.1f));
-				//cards.add(((Image) payload.getObject()));
-				//group.addActor((Image) payload.getObject());
-			}
-
-		}
-	}
-	private class FieldCellCardSource extends DragAndDrop.Source{
-
-		public FieldCellCardSource(CellActor cellActor) {
-			super(cellActor);
-		}
-
-		@Override
-		public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-			System.out.println("nachalo");
-			DragAndDrop.Payload payload = new DragAndDrop.Payload();
-			payload.setObject(getActor());
-			payload.setDragActor(((CellActor)getActor()).getBuildingCardActor());
-			((CellActor)getActor()).removeCartActor();
-			((CellActor)getActor()).setDrawable(skin,"badlogic");
-			return payload;
-		}
-		@Override
-		public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-			if(target==null) {
-				addBuildingCardToHand((CardActor) payload.getDragActor());
-				dragAndDropToHand.removeSource(this);
-				dragAndDroptoField.addTarget(new FieldTarget(getActor()));
-			}
-
-		}
-	}
-	private class CraftCellCardSource extends DragAndDrop.Source{
-
-		public CraftCellCardSource(CellActor cellActor) {
-			super(cellActor);
-		}
-
-		@Override
-		public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-			System.out.println("nachalo");
-			DragAndDrop.Payload payload = new DragAndDrop.Payload();
-			payload.setObject(getActor());
-			payload.setDragActor(((CellActor)getActor()).getBuildingCardActor());
-			((CellActor)getActor()).removeCartActor();
-			((CellActor)getActor()).setDrawable(skin,"badlogic");
-			return payload;
-		}
-		@Override
-		public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-			if(target==null) {
-				addcraftingcard((CardActor) payload.getDragActor());
-				DADToWorkshopHand.removeSource(this);
-				cardsInCraftingSlots.remove((CardActor) payload.getDragActor());
-				dragAndDropWorkshop.addTarget(new WorkShopTarget(getActor()));
-
-			}
-
-		}
-	}
-	private class FieldTarget extends DragAndDrop.Target {
-
-		public FieldTarget(Actor actor) {
-			super(actor);
-		}
-
-		public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-				getActor().setColor(Color.GREEN);
-				return true;
-			}
-
-			public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
-				getActor().setColor(Color.WHITE);
-			}
-
-			public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-				((CellActor)getActor()).setDrawable(skin,((CardActor) payload.getObject()).getDrawableName());
-				((CardActor) payload.getObject()).remove();
-				((CellActor)getActor()).setBuildingCardActor((CardActor) payload.getObject());
-				FieldCellCardSource fieldCardSource = new FieldCellCardSource(((CellActor)getActor()));
-				dragAndDropToHand.addSource(fieldCardSource);
-				System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);
-				dragAndDroptoField.removeTarget(this);
-			}
-
-	}
-	private class WorkShopTarget extends DragAndDrop.Target{
-		public WorkShopTarget(Actor actor) {
-			super(actor);
-		}
-
-		public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-			getActor().setColor(Color.GREEN);
-			return true;
-		}
-
-		public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
-			getActor().setColor(Color.WHITE);
-		}
-
-		public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-			((CellActor)getActor()).setDrawable(skin,((CardActor) payload.getObject()).getDrawableName());
-			((CardActor)payload.getObject()).remove();
-			((CellActor)getActor()).setBuildingCardActor((CardActor) payload.getObject());
-			cardsInCraftingSlots.add((CardActor) payload.getObject());
-			DADToWorkshopHand.addSource(new CraftCellCardSource(((CellActor)getActor())));
-			dragAndDropWorkshop.removeTarget(this);
-			System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);
-		}
-	}
 	private Group makeInfo() {
 		Group group = new Group();
-		label = new Label("You pressed this button "+count+" times",new Label.LabelStyle(new BitmapFont(),Color.BROWN));
-		group.addActor(label);
+		turnLabel = new Label("Turn: "+ turn,new Label.LabelStyle(new BitmapFont(),Color.BROWN));
+		turnLabel.setBounds(0,0,100,40);
+		group.addActor(turnLabel);
 		return group;
 	}
 
@@ -377,97 +190,49 @@ public class MotherBoardCard extends ApplicationAdapter {
 		for (CellActor cell: craftingCells ) {
 			cell.setDrawable(skin,"badlogic");
 			cell.removeCartActor();
-			dragAndDropWorkshop.addTarget(new WorkShopTarget(cell));
+			Singleton.getDADWorkshop().addTarget(Factory.createTarget(Factory.WORKSHOPTARGET,cell));
 		}
-		cardsInCraftingSlots.clear();
+		Singleton.getCardsInCraftingSlots().clear();
 	}
 
 	private void setActorsBounds(){
 		field.setBounds(0,0, WIDTH_SCREEN/3*2,HEIGH_FIELD);
 		toWorkshopBtn.setBounds(0,0,WIDTH_BUTTON,HEIGHT_HAND);
-
 		fieldGroup.setBounds(0,HEIGHT_HAND+PADDING, WIDTH_SCREEN,HEIGH_FIELD);
 		info.setBounds(0,HEIGHT_HAND+PADDING+HEIGH_FIELD+PADDING, WIDTH_SCREEN,HEIGHT_INFO);
 		workshop.setBounds(-WIDTH_SCREEN,HEIGHT_HAND+PADDING, WIDTH_SCREEN,HEIGH_FIELD);
-		toFields.setBounds(-WIDTH_SCREEN,0,WIDTH_BUTTON,HEIGHT_HAND);
+		debugBtn.setBounds(-WIDTH_SCREEN,0,WIDTH_BUTTON,HEIGHT_HAND);
 		endTurnBtn.setBounds(WIDTH_SCREEN/3*2,0,WIDTH_SCREEN/3,HEIGH_FIELD);
 	}
 
 	private void handleInput() {
-		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-			camera.zoom += 0.02;
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
-			camera.zoom -= 0.02;
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-//			if (camera.position.x > 0)
-				camera.translate(-3, 0, 0);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-//			if (camera.position.x < 1024)
-				camera.translate(3, 0, 0);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-//			if (camera.position.y > 0)
-				camera.translate(0, -3, 0);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
-//			if (camera.position.y < 1024)
-				camera.translate(0, 3, 0);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.W)) {
-			camera.rotate(-1, 0, 0, 1);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.E)) {
-			camera.rotate(1, 0, 0, 1);
-		}
-	}
-
-	private void addBuildingCardToHand(CardActor buildingCardActor){
-		cards.add(buildingCardActor);
-		dragAndDroptoField.addSource(new FieldCardSource(buildingCardActor));
-		buildingCardActor.setBounds(WIDTH_BUTTON+PADDING+CARD_WIDTH * (cards.size() - 1),0,CARD_WIDTH,CARD_WIDTH);
-		stage.addActor(buildingCardActor);
+		if(Gdx.input.isKeyPressed(Input.Keys.A)) camera.zoom += 0.02;
+		if(Gdx.input.isKeyPressed(Input.Keys.Q)) camera.zoom -= 0.02;
+		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) camera.translate(-3, 0, 0);
+		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) camera.translate(3, 0, 0);
+		if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) camera.translate(0, -3, 0);
+		if(Gdx.input.isKeyPressed(Input.Keys.UP)) camera.translate(0, 3, 0);
+		if(Gdx.input.isKeyPressed(Input.Keys.W)) camera.rotate(-1, 0, 0, 1);
+		if(Gdx.input.isKeyPressed(Input.Keys.E))camera.rotate(1, 0, 0, 1);
 	}
 	private void makeHand() {
-		for (int i = 0; i < 3; i++) {
-			addBuildingCardToHand(FactoryCard.createCard(Items.ENERGY_BUILDING));
-		}
-
-		addBuildingCardToHand(FactoryCard.createCard(Items.STORAGE_BUILDING));
-		dragAndDroptoField.setDragActorPosition(CARD_WIDTH / 2, -CARD_WIDTH/2 );
+		for (int i = 0; i < 3; i++) Singleton.addBuildingCard(Factory.createCard(Items.ENERGY_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(Items.STORAGE_BUILDING));
 	}
 
 	private Table makeField() {
-
 		Table table = new Table();
-
-		final CellActor[][] cells = new CellActor[FIELD_SIZE][FIELD_SIZE];
-		for (int i = 0; i < cells.length ; i++) {
-			for (int j = 0; j <cells[i].length ; j++) {
-				cells[i][j] = new CellActor(skin, "badlogic");
-				cells[i][j].setSize(CELL_WIDTH,CELL_WIDTH);
-				table.add(cells[i][j]).size(HEIGH_FIELD/ FIELD_SIZE,HEIGH_FIELD/ FIELD_SIZE);
-				dragAndDroptoField.addTarget(new FieldTarget(cells[i][j]));
+		fieldCells = new FieldCellActor[FIELD_SIZE][FIELD_SIZE];
+		for (int i = 0; i < fieldCells.length ; i++) {
+			for (int j = 0; j < fieldCells[i].length ; j++) {
+				fieldCells[i][j] = new FieldCellActor(skin, "badlogic");
+				fieldCells[i][j].setSize(CELL_WIDTH,CELL_WIDTH);
+				table.add(fieldCells[i][j]).size(HEIGH_FIELD/ FIELD_SIZE,HEIGH_FIELD/ FIELD_SIZE);
+				Singleton.getDADToField().addTarget(Factory.createTarget(Factory.FIELDTARGET,fieldCells[i][j]));
 			}
 			table.row();
 		}
 		return table;
-
-//		dragAndDrop.addTarget(new DragAndDrop.Target(invalidTargetImage) {
-//			public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-//				getActor().setColor(Color.RED);
-//				return false;
-//			}
-//
-//			public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
-//				getActor().setColor(Color.WHITE);
-//			}
-//
-//			public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-//			}
-//		});
 	}
 
 	@Override
@@ -475,18 +240,12 @@ public class MotherBoardCard extends ApplicationAdapter {
 		handleInput();
 		Gdx.gl.glClearColor(0, 1, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);	//макет игрового экрана
 		shapeRenderer.rect(0,0,WIDTH_BUTTON,HEIGHT_HAND);
 		shapeRenderer.rect(WIDTH_BUTTON+PADDING,0,WIDTH_HAND,HEIGHT_HAND);
 		shapeRenderer.rect(0,HEIGHT_HAND+PADDING, WIDTH_SCREEN,HEIGH_FIELD);
 		shapeRenderer.rect(0,HEIGHT_HAND+PADDING+HEIGH_FIELD+PADDING, WIDTH_SCREEN,HEIGHT_INFO);
 		shapeRenderer.end();
-
-//		batch.begin();
-//		batch.draw(texture,10,10);
-//		batch.draw(texture2,50,10);
-//		batch.end();
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
 	}
@@ -496,7 +255,6 @@ public class MotherBoardCard extends ApplicationAdapter {
 	}
 	@Override
 	public void dispose () {
-//		batch.dispose();
 		stage.dispose();
 	}
 }
