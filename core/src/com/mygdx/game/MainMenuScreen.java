@@ -4,19 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-
-import javax.print.attribute.standard.MediaSize;
 
 public class MainMenuScreen implements Screen {
     MotherBoardCard game;
     OrthographicCamera camera;
     public MainMenuScreen(MotherBoardCard game){
         this.game = game;
-
         camera = new OrthographicCamera();
-
-
         camera.setToOrtho(false,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
     }
 
