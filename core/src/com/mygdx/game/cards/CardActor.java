@@ -1,6 +1,5 @@
 package com.mygdx.game.cards;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -9,8 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.mygdx.game.Items;
 
-import static com.mygdx.game.MotherBoardCard.CARD_WIDTH;
-import static com.mygdx.game.MotherBoardCard.skin;
+import static com.mygdx.game.GameScreen.CARD_WIDTH;
+import static com.mygdx.game.GameScreen.skin;
 
 public abstract class CardActor extends Group {
 

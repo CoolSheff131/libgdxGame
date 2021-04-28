@@ -17,10 +17,10 @@ import com.mygdx.game.cards.resource.SchemeCardActor;
 import com.mygdx.game.cards.resource.WorkerCardActor;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
-import static com.mygdx.game.MotherBoardCard.CARD_WIDTH;
-import static com.mygdx.game.MotherBoardCard.PADDING;
-import static com.mygdx.game.MotherBoardCard.WIDTH_BUTTON;
-import static com.mygdx.game.MotherBoardCard.skin;
+import static com.mygdx.game.GameScreen.CARD_WIDTH;
+import static com.mygdx.game.GameScreen.PADDING;
+import static com.mygdx.game.GameScreen.WIDTH_BUTTON;
+import static com.mygdx.game.GameScreen.skin;
 
 public class Factory {
     public static CardActor createCard(Items type){

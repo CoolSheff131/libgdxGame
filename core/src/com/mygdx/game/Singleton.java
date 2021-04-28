@@ -7,9 +7,9 @@ import com.mygdx.game.cards.CardActor;
 
 import java.util.ArrayList;
 
-import static com.mygdx.game.MotherBoardCard.CARD_WIDTH;
-import static com.mygdx.game.MotherBoardCard.PADDING;
-import static com.mygdx.game.MotherBoardCard.WIDTH_BUTTON;
+import static com.mygdx.game.GameScreen.CARD_WIDTH;
+import static com.mygdx.game.GameScreen.PADDING;
+import static com.mygdx.game.GameScreen.WIDTH_BUTTON;
 
 public class Singleton {
 
