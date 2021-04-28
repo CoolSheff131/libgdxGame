@@ -8,7 +8,7 @@ import com.mygdx.game.cards.Factory;
 public class ResourceCardActor extends CardActor{
 
     public ResourceCardActor(){
-        super("res");
+        super("res","res");
 
     }
 

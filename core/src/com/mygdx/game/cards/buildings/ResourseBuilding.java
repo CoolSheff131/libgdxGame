@@ -3,25 +3,27 @@ package com.mygdx.game.cards.buildings;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.mygdx.game.Items;
 import com.mygdx.game.MotherBoardCard;
+import com.mygdx.game.Singleton;
+import com.mygdx.game.cards.Factory;
 
-public class EnergyBuildingCardActor extends Building {
-    public EnergyBuildingCardActor() {
-        super("en");
+public class ResourseBuilding extends Building{
+    public ResourseBuilding() {
+        super("BuildR","BuildR");
     }
 
     @Override
     public String getDrawableName() {
-        return "en";
+        return "BuildR";
     }
 
     @Override
     public Items getItemType() {
-        return Items.ENERGY_BUILDING;
+        return Items.STORAGE_BUILDING;
     }
 
     @Override
     public void doThing() {
-
+        Singleton.addcraftingcard(Factory.createCard(Items.RESOURSE_CARD));
         //todo добавить действие на завершение хода
     }
 }

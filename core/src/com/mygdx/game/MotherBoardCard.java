@@ -77,7 +77,7 @@ public class MotherBoardCard extends ApplicationAdapter {
 				turn++;
 				for (FieldCellActor[] fieldRow: fieldCells) {
 					for(FieldCellActor fieldCell: fieldRow){
-						fieldCell.doEndTurnThing();		//todo отдельый класс который будет отвечать за добавление карт?
+						fieldCell.doEndTurnThing();
 					}
 				}
 				turnLabel.setText("Turn: "+turn);
@@ -117,12 +117,15 @@ public class MotherBoardCard extends ApplicationAdapter {
 	}
 	private void init(){
 		skin = new Skin();
+		skin.add("fieldCell", new Texture("sprites/FieldCellImg.png"));
 		skin.add("badlogic", new Texture("heart.png"));
-		skin.add("res", new Texture("resourceTest.png"));
-		skin.add("scheme", new Texture("schemeTest.png"));
-		skin.add("worker", new Texture("workerTest.png"));
-		skin.add("en", new Texture("EnergyTest.png"));
-		skin.add("stor", new Texture("StorageTest.png"));
+		skin.add("coem", new Texture("sprites/coem.png"));
+		skin.add("res", new Texture("sprites/resourceImg.png"));
+		skin.add("scheme", new Texture("sprites/schemeImg.png"));
+		skin.add("worker", new Texture("sprites/workerImg.png"));
+		skin.add("BuildR", new Texture("sprites/BuildingRes.png"));
+		skin.add("BuildS", new Texture("sprites/BuildingScheme.png"));
+		skin.add("BuildW", new Texture("sprites/BuildingWork.png"));
 		WIDTH_SCREEN = Gdx.graphics.getWidth();
 		HEIGHT_SCREEN = Gdx.graphics.getHeight();
 		HEIGHT_HAND = HEIGHT_SCREEN /6;
@@ -225,7 +228,7 @@ public class MotherBoardCard extends ApplicationAdapter {
 		fieldCells = new FieldCellActor[FIELD_SIZE][FIELD_SIZE];
 		for (int i = 0; i < fieldCells.length ; i++) {
 			for (int j = 0; j < fieldCells[i].length ; j++) {
-				fieldCells[i][j] = new FieldCellActor(skin, "badlogic");
+				fieldCells[i][j] = new FieldCellActor(skin, "fieldCell");
 				fieldCells[i][j].setSize(CELL_WIDTH,CELL_WIDTH);
 				table.add(fieldCells[i][j]).size(HEIGH_FIELD/ FIELD_SIZE,HEIGH_FIELD/ FIELD_SIZE);
 				Singleton.getDADToField().addTarget(Factory.createTarget(Factory.FIELDTARGET,fieldCells[i][j]));

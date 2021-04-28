@@ -9,8 +9,8 @@ import com.mygdx.game.cells.CellActor;
 import com.mygdx.game.cells.FieldCellActor;
 import com.mygdx.game.Singleton;
 import com.mygdx.game.cards.buildings.Building;
-import com.mygdx.game.cards.buildings.EnergyBuildingCardActor;
-import com.mygdx.game.cards.buildings.StorageBuildingCardActor;
+import com.mygdx.game.cards.buildings.SchemeBuilding;
+import com.mygdx.game.cards.buildings.ResourseBuilding;
 import com.mygdx.game.cards.resource.ResourceCardActor;
 import com.mygdx.game.Items;
 import com.mygdx.game.cards.resource.SchemeCardActor;
@@ -35,10 +35,10 @@ public class Factory {
             case SCHEME_CARD:cardActor = new SchemeCardActor();
                 cardActor.setSource(createSource(CraftingCardSource,cardActor));
                 break;
-            case ENERGY_BUILDING: cardActor = new EnergyBuildingCardActor();
+            case ENERGY_BUILDING: cardActor = new SchemeBuilding();
                 cardActor.setSource(createSource(BuildingCardSource,cardActor));
                 break;
-            case STORAGE_BUILDING:cardActor = new StorageBuildingCardActor();
+            case STORAGE_BUILDING:cardActor = new ResourseBuilding();
                 cardActor.setSource(createSource(BuildingCardSource,cardActor));
                 break;
 
@@ -111,7 +111,7 @@ public class Factory {
                         payload.setDragActor(((CellActor)getActor()).getBuildingCardActor());
                         ((CellActor)getActor()).removeCartActor();
                         ((FieldCellActor)getActor()).removeBuilding();//убираем постройку с КЛЕТКИ (актера) поля
-                        ((CellActor)getActor()).setDrawable(skin,"badlogic");
+                        ((CellActor)getActor()).setDrawable(((CellActor)getActor()).getDrawable());
                         return payload;
                     }
                     @Override
@@ -135,7 +135,7 @@ public class Factory {
                         payload.setDragActor(((CellActor)getActor()).getBuildingCardActor());
                         ((CellActor)getActor()).removeCartActor();
                         Singleton.getCardsInCraftingSlots().remove((CardActor) payload.getDragActor());// убираем карту с крафта
-                        ((CellActor)getActor()).setDrawable(skin,"badlogic");
+                        ((CellActor)getActor()).setDrawable(((CellActor)getActor()).getDrawable());
                         return payload;
                     }
                     @Override
