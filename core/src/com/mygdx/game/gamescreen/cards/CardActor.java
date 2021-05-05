@@ -26,10 +26,11 @@ public abstract class CardActor extends Group {
         img.setBounds(0,CARD_WIDTH/2,CARD_WIDTH,CARD_WIDTH/2);
         lblName.setBounds(0,CARD_WIDTH/2,CARD_WIDTH,CARD_WIDTH/5);
         coem.setBounds(0,0,CARD_WIDTH,CARD_WIDTH);
+        addActor(coem);
         addActor(img);
         addActor(lblName);
         addActor(lblDescription);
-        addActor(coem);
+
     }
 
     public void setSource(DragAndDrop.Source source) {

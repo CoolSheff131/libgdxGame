@@ -19,6 +19,7 @@ import com.mygdx.game.gamescreen.cards.resource.WorkerCardActor;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
 import static com.mygdx.game.gamescreen.GameScreen.CARD_WIDTH;
+import static com.mygdx.game.gamescreen.GameScreen.HEIGHT_CRAFTING_HAND;
 import static com.mygdx.game.gamescreen.GameScreen.PADDING;
 import static com.mygdx.game.gamescreen.GameScreen.WIDTH_BUTTON;
 import static com.mygdx.game.gamescreen.GameScreen.skin;
@@ -71,7 +72,7 @@ public class Factory {
                         Singleton.getCraftingCards().remove(getActor());
                         System.out.println(Singleton.getCraftingCards().size()+" crafting cards");
                         for (int c = 0;c<Singleton.getCraftingCards().size();c++) {
-                            Singleton.getCraftingCards().get(c).addAction(moveTo(CARD_WIDTH * c,0,0.1f));
+                            Singleton.getCraftingCards().get(c).addAction(moveTo(CARD_WIDTH * c,HEIGHT_CRAFTING_HAND,0.1f));
                         }
                         return payload;
                     }
@@ -79,7 +80,7 @@ public class Factory {
                     public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
                         if(target==null) {
                             Singleton.getCraftingCards().add(((CardActor) payload.getObject()));
-                            ((CardActor) payload.getObject()).addAction(moveTo(CARD_WIDTH*(Singleton.getCraftingCards().size()-1),0,0.1f));
+                            ((CardActor) payload.getObject()).addAction(moveTo(CARD_WIDTH*(Singleton.getCraftingCards().size()-1),HEIGHT_CRAFTING_HAND,0.1f));
                         }
                     }
                 }; break;

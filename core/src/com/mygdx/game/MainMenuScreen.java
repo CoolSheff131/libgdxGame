@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -29,15 +30,16 @@ public class MainMenuScreen implements Screen {
     private Stage stage;
     private OrthographicCamera camera;
     private Group mainMenu, levels, options;
-    private ArrayList<Button> mainButtons, levelsButton,choosLvlBtn;
+    private ArrayList<Button> mainButtons,choosLvlBtn;
     private ArrayList<OptionItem> optionItems;
     private Label menuLabel,levelLabel, optionLabel,gameLabel;
     private Skin skin;
     public static BitmapFont lblfont,bigFont;
     protected static TextButton.TextButtonStyle checkBtnStyle, textButtonStyle;
     private int WIDTH_SCREEN, HEIGHT_SCREEN;
-    private TextButton backOption;
+    private TextButton backOption,backLevel;
     protected static int BUTTON_WIDTH, BUTTON_HEIGHT;
+    private Texture background;
     public MainMenuScreen(final MotherBoardCard game){
         WIDTH_SCREEN = MotherBoardCard.getWidthScreen();
         HEIGHT_SCREEN = MotherBoardCard.getHeightScreen();
@@ -54,10 +56,10 @@ public class MainMenuScreen implements Screen {
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/k.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 130;
+        parameter.size = 100;
         bigFont = generator.generateFont(parameter);
         gameLabel = new Label("MotherBoardCard",new Label.LabelStyle(bigFont, Color.WHITE));
-        gameLabel.setPosition(WIDTH_SCREEN/10,HEIGHT_SCREEN/8*6);
+        gameLabel.setPosition(WIDTH_SCREEN/2-gameLabel.getWidth()/2,HEIGHT_SCREEN/8*7);
         parameter.size = 20;
 
         textButtonStyle = new TextButton.TextButtonStyle();
@@ -75,8 +77,13 @@ public class MainMenuScreen implements Screen {
         checkBtnStyle = new TextButton.TextButtonStyle();
         checkBtnStyle.up =  skin.getDrawable("check");
 
+        int WIDTH_MENU = WIDTH_SCREEN/3*2,HEIGHT_MENU = HEIGHT_SCREEN;
+        background = new Texture("sprites/Wood.png");
         //========main menu===============
         mainMenu = new Group();
+        Image menuPanel = new Image( new Texture("sprites/menuPanel.png"));
+        menuPanel.setBounds(WIDTH_SCREEN/6,0,WIDTH_MENU,HEIGHT_MENU);
+        mainMenu.addActor(menuPanel);
         mainMenu.setBounds(0,0,WIDTH_SCREEN,HEIGHT_SCREEN);
         mainButtons = new ArrayList<>();
 
@@ -84,8 +91,7 @@ public class MainMenuScreen implements Screen {
         mainButtons.add(new TextButton("Options",textButtonStyle));
         int i =0;
 
-
-        BUTTON_WIDTH = WIDTH_SCREEN /3*2;
+        BUTTON_WIDTH = WIDTH_SCREEN /3;
         BUTTON_HEIGHT = HEIGHT_SCREEN / 6;
         for (Button button: mainButtons) {
             button.setBounds(WIDTH_SCREEN/2 - BUTTON_WIDTH/2,HEIGHT_SCREEN/4*2 - i * BUTTON_HEIGHT,BUTTON_WIDTH,BUTTON_HEIGHT);
@@ -94,24 +100,24 @@ public class MainMenuScreen implements Screen {
         }
         menuLabel = new Label("MAIN MENU ",new Label.LabelStyle(lblfont, Color.WHITE));
         mainMenu.addActor(menuLabel);
-        menuLabel.setPosition(WIDTH_SCREEN/3,HEIGHT_SCREEN/8*5);
+        menuLabel.setPosition(WIDTH_SCREEN/2-menuLabel.getWidth()/2,HEIGHT_SCREEN/8*6);
+
         //=========LEVELS========
         levels = new Group();
+        Image levelPanel = new Image( new Texture("sprites/menuPanel.png"));
+        levelPanel.setBounds(WIDTH_SCREEN/6,0,WIDTH_MENU,HEIGHT_MENU);
+        levels.addActor(levelPanel);
         levels.setBounds(WIDTH_SCREEN,0,WIDTH_SCREEN,HEIGHT_SCREEN);
-        levelsButton = new ArrayList<>();
-        levelsButton.add(new TextButton("Back",textButtonStyle));
-        i =0;
-        for (Button button: levelsButton) {
-            button.setBounds(0,HEIGHT_SCREEN/2,WIDTH_SCREEN/3,BUTTON_HEIGHT);
-            i++;
-            levels.addActor(button);
-        }
+
+        backLevel = new TextButton("Back",textButtonStyle);
+        backLevel.setBounds(WIDTH_SCREEN/2-BUTTON_WIDTH/2,BUTTON_HEIGHT,BUTTON_WIDTH,BUTTON_HEIGHT);
+        levels.addActor(backLevel);
         levelLabel = new Label("LEVELS",new Label.LabelStyle(lblfont, Color.WHITE));
         levels.addActor(levelLabel);
-        levelLabel.setPosition(WIDTH_SCREEN/20,HEIGHT_SCREEN/3*2);
+        levelLabel.setPosition(WIDTH_SCREEN/2-levelLabel.getWidth()/2,HEIGHT_SCREEN/8*7);
         choosLvlBtn = new ArrayList<>();
         Table table = new Table();
-        i =0;
+        i = 0;
         int TABLE_WIDTH = WIDTH_SCREEN/3*2,TABLE_HEIGHT = HEIGHT_SCREEN;
         int maxInRow = 3;
         for (final LevelInfo lvlInfo: LevelManager.getLevelInfos()) { //Добавляем кнопки выбора уровня
@@ -136,11 +142,15 @@ public class MainMenuScreen implements Screen {
         }
         table.setPosition(WIDTH_SCREEN/2,0);
         table.setDebug(true);
-        table.setBounds(WIDTH_SCREEN/3,0,TABLE_WIDTH,TABLE_HEIGHT);
+        table.setBounds(WIDTH_SCREEN/2-TABLE_WIDTH/2,0,TABLE_WIDTH,TABLE_HEIGHT);
         levels.addActor(table);
 
         //=================OPTIONS====================
         options = new Group();
+        Image optionPanel = new Image( new Texture("sprites/menuPanel.png"));
+        optionPanel.setBounds(WIDTH_SCREEN/6,0,WIDTH_MENU,HEIGHT_MENU);
+        options.addActor(optionPanel);
+
         options.setBounds(-WIDTH_SCREEN,0,WIDTH_SCREEN,HEIGHT_SCREEN);
 
         backOption = new TextButton("Back",textButtonStyle);
@@ -153,7 +163,7 @@ public class MainMenuScreen implements Screen {
             options.addActor(button);
         }
         optionLabel = new Label("OPTIONS",new Label.LabelStyle(lblfont, Color.WHITE));
-        backOption.setBounds(0,0,BUTTON_WIDTH,BUTTON_HEIGHT);
+        backOption.setBounds(WIDTH_SCREEN/2-BUTTON_WIDTH/2,BUTTON_HEIGHT,BUTTON_WIDTH,BUTTON_HEIGHT);
         options.addActor(backOption);
         options.addActor(optionLabel);
         optionLabel.setPosition(WIDTH_SCREEN/2-optionLabel.getWidth()/2,HEIGHT_SCREEN/4*3);
@@ -187,7 +197,7 @@ public class MainMenuScreen implements Screen {
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
-        levelsButton.get(0).addListener(new InputListener(){
+        backLevel.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 mainMenu.addAction(moveBy(WIDTH_SCREEN,0,0.15f));
@@ -230,6 +240,9 @@ public class MainMenuScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
+        game.batch.begin();
+        game.batch.draw(background,0,0,WIDTH_SCREEN,HEIGHT_SCREEN);
+        game.batch.end();
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
     }

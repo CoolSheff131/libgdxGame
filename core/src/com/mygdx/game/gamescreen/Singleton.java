@@ -32,7 +32,7 @@ public class Singleton {
         DADWorkshop.addSource(cardActor.getSource());
         workshop.addActor(cardActor);
         craftingCards.add(cardActor);
-        cardActor.setBounds(CARD_WIDTH * (Singleton.getCraftingCards().size() - 1),0,CARD_WIDTH,CARD_WIDTH);
+        cardActor.setBounds(CARD_WIDTH * (Singleton.getCraftingCards().size() - 1),CARD_WIDTH+PADDING,CARD_WIDTH,CARD_WIDTH);
     }
     public static void removecraftingcard(CardActor cardActor){
         //DADWorkshop.removeSource(cardActor.getSource());
