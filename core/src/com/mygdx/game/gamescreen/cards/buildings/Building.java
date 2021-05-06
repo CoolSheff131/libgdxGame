@@ -1,6 +1,5 @@
 package com.mygdx.game.gamescreen.cards.buildings;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.mygdx.game.gamescreen.Singleton;
 import com.mygdx.game.gamescreen.cards.CardActor;
@@ -33,7 +32,7 @@ public abstract class Building extends CardActor {
     protected void build(){
         isBuilded = true;
         if (occupiedCell != null){
-            occupiedCell.setDrawable(skin,buildedName);
+            occupiedCell.setPlacedObjImg(skin,buildedName);
             Singleton.getDADToHand().removeSource( occupiedCell.getSource());//Убираем возможность перетаскивать построенной
         }
     }

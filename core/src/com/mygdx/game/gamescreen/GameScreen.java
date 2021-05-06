@@ -18,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -368,12 +367,13 @@ public class GameScreen implements Screen {
 
 	private void makeWorkshop() {
 		Table craftingTable = new Table();//Создание поле крафта
+
 		for (int i = 0; i < craftingCells.length ; i++) {
-			craftingCells[i] = new CraftingCellActor(skin, "craftCell");
+			craftingCells[i] = new CraftingCellActor(skin, "craftCell",WIDTH_SCREEN/4*2/3);
 			craftingTable.add(craftingCells[i]).grow();
 			Singleton.getDADWorkshop().addTarget(Factory.createTarget(Factory.WORKSHOPTARGET,craftingCells[i]));
 		}
-
+		craftingTable.setDebug(true);
 		craftingRes = new Container<>();
 		workshop.addActor(woodenTable);
 		workshop.addActor(craftMachineImg);
@@ -408,7 +408,7 @@ public class GameScreen implements Screen {
 	}
 	private void clearCraftingCells(){
 		for (CellActor cell: craftingCells ) {
-			cell.setDrawable(skin,"craftCell");
+			cell.setPlacedObjImg(skin,"craftCell");
 			cell.removeCartActor();
 			Singleton.getDADWorkshop().addTarget(Factory.createTarget(Factory.WORKSHOPTARGET,cell));
 		}
@@ -468,6 +468,9 @@ public class GameScreen implements Screen {
 		Singleton.addBuildingCard(Factory.createCard(Items.ENERGY_BUILDING));
 		Singleton.addBuildingCard(Factory.createCard(Items.ENERGY_BUILDING));
 		Singleton.addBuildingCard(Factory.createCard(Items.ENERGY_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(Items.RESOURSE_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(Items.WORKER_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(Items.SCHEME_BUILDING));
 	}
 
 	private Table makeField() {
@@ -475,7 +478,7 @@ public class GameScreen implements Screen {
 		fieldCells = new FieldCellActor[FIELD_SIZE][FIELD_SIZE];
 		for (int i = 0; i < fieldCells.length ; i++) {
 			for (int j = 0; j < fieldCells[i].length ; j++) {
-				fieldCells[i][j] = new FieldCellActor(skin, "fieldCell");
+				fieldCells[i][j] = new FieldCellActor(skin, "fieldCell",HEIGH_FIELD/ FIELD_SIZE);
 				fieldCells[i][j].setSize(CELL_WIDTH,CELL_WIDTH);
 				table.add(fieldCells[i][j]).size(HEIGH_FIELD/ FIELD_SIZE,HEIGH_FIELD/ FIELD_SIZE);
 				Singleton.getDADToField().addTarget(Factory.createTarget(Factory.FIELDTARGET,fieldCells[i][j]));

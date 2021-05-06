@@ -6,7 +6,7 @@ import com.mygdx.game.gamescreen.cards.Factory;
 
 public class WorkerBuilding extends Building {
     public WorkerBuilding() {
-        super("BuildW","BuildWSch");
+        super("BuildW","BuildW");
     }
 
     @Override
@@ -22,7 +22,8 @@ public class WorkerBuilding extends Building {
 
     @Override
     public void doThing() {
-        Singleton.addcraftingcard(Factory.createCard(Items.WORKER_CARD));
+        if(!isBuilded) build();
+        else Singleton.addcraftingcard(Factory.createCard(Items.WORKER_CARD));
 
     }
 }

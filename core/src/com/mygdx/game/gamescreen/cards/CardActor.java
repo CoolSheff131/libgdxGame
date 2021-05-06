@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.mygdx.game.MainMenuScreen;
 import com.mygdx.game.gamescreen.Items;
 
 import static com.mygdx.game.gamescreen.GameScreen.CARD_WIDTH;
@@ -20,12 +21,16 @@ public abstract class CardActor extends Group {
     public CardActor(String drawableName,String name) {
         super();//MotherBoardCard.skin, drawableName
         img = new Image(skin,drawableName);
-        lblName =  new Label(name,new Label.LabelStyle(new BitmapFont(), Color.BROWN));
-        lblDescription =  new Label("Description",new Label.LabelStyle(new BitmapFont(), Color.BROWN));
+
+        lblName =  new Label(name,new Label.LabelStyle(MainMenuScreen.smallFont, Color.WHITE));
+        lblDescription =  new Label("Description",new Label.LabelStyle(MainMenuScreen.smallFont, Color.WHITE));
         coem = new Image(skin,"coem");
-        img.setBounds(0,CARD_WIDTH/2,CARD_WIDTH,CARD_WIDTH/2);
-        lblName.setBounds(0,CARD_WIDTH/2,CARD_WIDTH,CARD_WIDTH/5);
+
+        img.setBounds(0,CARD_WIDTH/2,CARD_WIDTH-CARD_WIDTH/10,CARD_WIDTH/2-CARD_WIDTH/10);
+        lblName.setPosition(CARD_WIDTH/2-lblName.getWidth()/2,CARD_WIDTH/2);
+        lblDescription.setPosition(CARD_WIDTH/2-lblDescription.getWidth()/2,CARD_WIDTH/2-CARD_WIDTH/3);
         coem.setBounds(0,0,CARD_WIDTH,CARD_WIDTH);
+
         addActor(coem);
         addActor(img);
         addActor(lblName);

@@ -34,7 +34,7 @@ public class MainMenuScreen implements Screen {
     private ArrayList<OptionItem> optionItems;
     private Label menuLabel,levelLabel, optionLabel,gameLabel;
     private Skin skin;
-    public static BitmapFont lblfont,bigFont;
+    public static BitmapFont lblfont,bigFont,smallFont;
     protected static TextButton.TextButtonStyle checkBtnStyle, textButtonStyle;
     private int WIDTH_SCREEN, HEIGHT_SCREEN;
     private TextButton backOption,backLevel;
@@ -66,6 +66,8 @@ public class MainMenuScreen implements Screen {
         BitmapFont font = generator.generateFont(parameter);
         parameter.size = 40;
         lblfont = generator.generateFont(parameter);
+        parameter.size = 10;
+        smallFont = generator.generateFont(parameter);
         generator.dispose();
         textButtonStyle.font = font;
         textButtonStyle.fontColor = Color.BLACK;
@@ -141,7 +143,7 @@ public class MainMenuScreen implements Screen {
                 table.row();
         }
         table.setPosition(WIDTH_SCREEN/2,0);
-        table.setDebug(true);
+        //table.setDebug(true);
         table.setBounds(WIDTH_SCREEN/2-TABLE_WIDTH/2,0,TABLE_WIDTH,TABLE_HEIGHT);
         levels.addActor(table);
 

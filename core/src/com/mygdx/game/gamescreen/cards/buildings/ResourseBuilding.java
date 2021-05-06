@@ -6,7 +6,7 @@ import com.mygdx.game.gamescreen.cards.Factory;
 
 public class ResourseBuilding extends Building{
     public ResourseBuilding() {
-        super("BuildR","BuildRSch");
+        super("BuildR","BuildR");
     }
 
     @Override
@@ -22,7 +22,8 @@ public class ResourseBuilding extends Building{
 
     @Override
     public void doThing() {
-        Singleton.addcraftingcard(Factory.createCard(Items.RESOURSE_CARD));
+        if(!isBuilded) build();
+        else Singleton.addcraftingcard(Factory.createCard(Items.RESOURSE_CARD));
 
     }
 }

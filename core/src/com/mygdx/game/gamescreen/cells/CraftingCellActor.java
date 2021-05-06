@@ -5,8 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.mygdx.game.gamescreen.cards.Factory;
 
 public class CraftingCellActor extends CellActor{
-    public CraftingCellActor(Skin skin, String drawableName) {
-        super(skin, drawableName);
+    public CraftingCellActor(Skin skin, String drawableName,int size) {
+        super(skin, drawableName,size);
         target = Factory.createTarget(Factory.WORKSHOPTARGET,this);
         source = Factory.createSource(Factory.CRAFTCELLCARDSOURCE,this);
     }
@@ -27,7 +27,6 @@ public class CraftingCellActor extends CellActor{
 
     public void clearBuilding(){
         removeCartActor();
-
-        setDrawable(getDrawable());
+        setPlacedObjImg(getDrawableClear());
     }
 }

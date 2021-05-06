@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Null;
 import com.mygdx.game.gamescreen.cards.buildings.EnergyBuilding;
+import com.mygdx.game.gamescreen.cards.buildings.WorkerBuilding;
 import com.mygdx.game.gamescreen.cells.CellActor;
 import com.mygdx.game.gamescreen.cells.FieldCellActor;
 import com.mygdx.game.gamescreen.Singleton;
@@ -41,7 +42,7 @@ public class Factory {
             case RESOURSE_BUILDING:cardActor = new ResourseBuilding();
                 cardActor.setSource(createSource(BuildingCardSource,cardActor));
                 break;
-            case WORKER_BUILDING:cardActor = new WorkerCardActor();
+            case WORKER_BUILDING:cardActor = new WorkerBuilding();
                 cardActor.setSource(createSource(BuildingCardSource,cardActor));
                 break;
             case SCHEME_BUILDING: cardActor = new SchemeBuilding();
@@ -120,7 +121,7 @@ public class Factory {
                         payload.setDragActor(((CellActor)getActor()).getBuildingCardActor());
                         ((CellActor)getActor()).removeCartActor();
                         ((FieldCellActor)getActor()).removeBuilding();//убираем постройку с КЛЕТКИ (актера) поля
-                        ((CellActor)getActor()).setDrawable(((CellActor)getActor()).getDrawable());
+                        ((CellActor)getActor()).setPlacedObjImg(((CellActor)getActor()).getDrawableClear());
                         return payload;
                     }
                     @Override
@@ -141,7 +142,7 @@ public class Factory {
                         payload.setDragActor(((CellActor)getActor()).getBuildingCardActor());
                         ((CellActor)getActor()).removeCartActor();
                         Singleton.getCardsInCraftingSlots().remove((CardActor) payload.getDragActor());// убираем карту с крафта
-                        ((CellActor)getActor()).setDrawable(((CellActor)getActor()).getDrawable());
+                        ((CellActor)getActor()).setPlacedObjImg(((CellActor)getActor()).getDrawableClear());//todo
                         return payload;
                     }
                     @Override
@@ -173,7 +174,7 @@ public class Factory {
                     }
 
                     public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                        ((CellActor)getActor()).setDrawable(skin,((CardActor) payload.getObject()).getDrawableName());//устанавливаем картинку поставленной картинки
+                        ((CellActor)getActor()).setPlacedObjImg(skin,((CardActor) payload.getObject()).getDrawableName());//устанавливаем картинку поставленной картинки
                         ((Building) payload.getObject()).setOccupiedCell((FieldCellActor) getActor());
                         ((CardActor) payload.getObject()).remove();										//убираем актера со сцены
                         ((CellActor)getActor()).setBuildingCardActor((CardActor) payload.getObject());	//устанавливаем карту
@@ -195,7 +196,7 @@ public class Factory {
                     }
 
                     public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                        ((CellActor)getActor()).setDrawable(skin,((CardActor) payload.getObject()).getDrawableName());//устанавливаем картинку поставленной картинки
+                        ((CellActor)getActor()).setPlacedObjImg(skin,((CardActor) payload.getObject()).getDrawableName());//устанавливаем картинку поставленной картинки
                         ((CardActor)payload.getObject()).remove();// убираем актера со сцены
                         ((CellActor)getActor()).setBuildingCardActor((CardActor) payload.getObject());//устанавливаем карту
                         Singleton.getCardsInCraftingSlots().add((CardActor) payload.getObject());//добавляем карту в крафт

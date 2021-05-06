@@ -8,8 +8,8 @@ import com.mygdx.game.gamescreen.cards.buildings.Building;
 
 public class FieldCellActor extends CellActor{
     private Building building;
-    public FieldCellActor(Skin skin, String drawableName) {
-        super(skin, drawableName);
+    public FieldCellActor(Skin skin, String drawableName,int size) {
+        super(skin, drawableName,size);
         target = Factory.createTarget(Factory.FIELDTARGET,this);
         source = Factory.createSource(Factory.FieldCellCardSource,this);
     }
@@ -43,7 +43,7 @@ public class FieldCellActor extends CellActor{
     public void clearBuilding(){
         removeCartActor();
         removeBuilding();//убираем постройку с КЛЕТКИ (актера) поля
-        setDrawable(getDrawable());
+        placedCraftingCard.setDrawable(getDrawableClear());
         Singleton.getDADToField().addTarget(getTarget());
     }
 }
