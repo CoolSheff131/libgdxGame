@@ -14,7 +14,6 @@ import com.mygdx.game.gamescreen.cards.buildings.Building;
 import com.mygdx.game.gamescreen.cards.buildings.SchemeBuilding;
 import com.mygdx.game.gamescreen.cards.buildings.ResourseBuilding;
 import com.mygdx.game.gamescreen.cards.resource.ResourceCardActor;
-import com.mygdx.game.gamescreen.Items;
 import com.mygdx.game.gamescreen.cards.resource.SchemeCardActor;
 import com.mygdx.game.gamescreen.cards.resource.WorkerCardActor;
 
@@ -29,133 +28,97 @@ public class Factory {
     public static CardActor createCard(Items type){
         CardActor cardActor = null;
         switch (type){
-            case RESOURSE_CARD: cardActor = new ResourceCardActor();
-                cardActor.setSource(createSource(CraftingCardSource,cardActor));
-                break;
-            case WORKER_CARD:cardActor = new WorkerCardActor();
-                cardActor.setSource(createSource(CraftingCardSource,cardActor));
-                break;
-            case SCHEME_CARD:cardActor = new SchemeCardActor();
-                cardActor.setSource(createSource(CraftingCardSource,cardActor));
-                break;
-
-            case RESOURSE_BUILDING:cardActor = new ResourseBuilding();
-                cardActor.setSource(createSource(BuildingCardSource,cardActor));
-                break;
-            case WORKER_BUILDING:cardActor = new WorkerBuilding();
-                cardActor.setSource(createSource(BuildingCardSource,cardActor));
-                break;
-            case SCHEME_BUILDING: cardActor = new SchemeBuilding();
-                cardActor.setSource(createSource(BuildingCardSource,cardActor));
-                break;
-            case ENERGY_BUILDING: cardActor = new EnergyBuilding();
-            cardActor.setSource(createSource(BuildingCardSource,cardActor));
-                break;
-
+            case RESOURSE_CARD: cardActor = new ResourceCardActor(); break;
+            case WORKER_CARD:cardActor = new WorkerCardActor(); break;
+            case SCHEME_CARD:cardActor = new SchemeCardActor(); break;
+            case RESOURSE_BUILDING:cardActor = new ResourseBuilding();break;
+            case WORKER_BUILDING:cardActor = new WorkerBuilding();  break;
+            case SCHEME_BUILDING: cardActor = new SchemeBuilding(); break;
+            case ENERGY_BUILDING: cardActor = new EnergyBuilding(); break;
         }
+        cardActor.setSource(createSource(cardActor));
         return cardActor;
     }
-    public static final int CRAFTCELLCARDSOURCE = 1;
-    public static final int FieldCellCardSource = 2;
-    public static final int BuildingCardSource = 3;
-    public static final int CraftingCardSource = 4;
-
-    public static DragAndDrop.Source createSource(int type, Actor actor){
-        DragAndDrop.Source source = null;
-        switch (type){
-            case CraftingCardSource:
-                source = new DragAndDrop.Source(actor) {
-                    @Override
-                    public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-                        DragAndDrop.Payload payload = new DragAndDrop.Payload();
+    public static DragAndDrop.Source createSource(Actor actor) {
+        return new DragAndDrop.Source(actor) {
+            @Null
+            public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                switch (((CellOrCard) getActor()).CellOrCard()) {
+                    case 0: // карта
                         payload.setObject(getActor());
                         payload.setDragActor(getActor());
-                        Singleton.getCraftingCards().remove(getActor());
-                        System.out.println(Singleton.getCraftingCards().size()+" crafting cards");
-                        for (int c = 0;c<Singleton.getCraftingCards().size();c++) {
-                            Singleton.getCraftingCards().get(c).addAction(moveTo(CARD_WIDTH * c,HEIGHT_CRAFTING_HAND,0.1f));
+                        switch (((CardActor) payload.getDragActor()).getFamilyType()) {
+                            case BUILDING:
+                            case UPGRAGE:
+                                Singleton.getBuildingCards().remove(getActor());
+                                for (int c = 0; c < Singleton.getBuildingCards().size(); c++) {
+                                    Singleton.getBuildingCards().get(c).addAction(moveTo(WIDTH_BUTTON + PADDING + CARD_WIDTH * c, 0, 0.1f));
+                                }
+                                break;
+                            case CRAFTING:
+                                Singleton.getCraftingCards().remove(getActor());
+                                for (int c = 0; c < Singleton.getCraftingCards().size(); c++) {
+                                    Singleton.getCraftingCards().get(c).addAction(moveTo(CARD_WIDTH * c, HEIGHT_CRAFTING_HAND, 0.1f));
+                                }
+                                break;
                         }
-                        return payload;
-                    }
-                    @Override
-                    public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-                        if(target==null) {
-                            Singleton.getCraftingCards().add(((CardActor) payload.getObject()));
-                            ((CardActor) payload.getObject()).addAction(moveTo(CARD_WIDTH*(Singleton.getCraftingCards().size()-1),HEIGHT_CRAFTING_HAND,0.1f));
-                        }
-                    }
-                }; break;
-            case BuildingCardSource:
-                source = new DragAndDrop.Source(actor) {
-                    @Null
-                    public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
-                        DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                        payload.setObject(getActor());
-                        payload.setDragActor(getActor());
-
                         Singleton.getBuildingCards().remove(getActor());
-
-
-                        System.out.println(Singleton.getBuildingCards().size());
                         for (int c = 0; c < Singleton.getBuildingCards().size(); c++) {
-                            Singleton.getBuildingCards().get(c).addAction(moveTo(WIDTH_BUTTON+PADDING+CARD_WIDTH * c,0,0.1f));
+                            Singleton.getBuildingCards().get(c).addAction(moveTo(WIDTH_BUTTON + PADDING + CARD_WIDTH * c, 0, 0.1f));
                         }
-                        return payload;
-                    }
-
-                    @Override
-                    public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-                        if(target==null) {
-                            Singleton.getBuildingCards().add(((CardActor) payload.getObject()));
-                            ((CardActor) payload.getObject()).addAction(moveTo(WIDTH_BUTTON+PADDING+CARD_WIDTH*(Singleton.getBuildingCards().size()-1),0,0.1f));
-                        }
-
-                    }
-                }; break;
-            case FieldCellCardSource:
-                source = new DragAndDrop.Source(actor) {
-                    @Override
-                    public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-                        DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                        break;
+                    case 1://ячейка
                         payload.setObject(getActor());
-                        payload.setDragActor(((CellActor)getActor()).getBuildingCardActor());
-                        ((CellActor)getActor()).removeCartActor();
-                        ((FieldCellActor)getActor()).removeBuilding();//убираем постройку с КЛЕТКИ (актера) поля
-                        ((CellActor)getActor()).setPlacedObjImg(((CellActor)getActor()).getDrawableClear());
-                        return payload;
+                        payload.setDragActor(((CellActor) getActor()).getBuildingCardActor());  // Ставим перетаскиваемой рисунок на ячейке
+                        ((CellActor) getActor()).clearCell();//убираем постройку с КЛЕТКИ (актера) поля
+                        ((CellActor) getActor()).setPlacedObjImg(((CellActor) getActor()).getDrawableClear());
+                        Singleton.getDADToField().removeSource(this);
+                        Singleton.getDADToField().addTarget(((CellActor) getActor()).getTarget());
+                        break;
+                }
+                return payload;
+            }
+            @Override
+            public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
+                if (target == null) {
+                    switch (((CellOrCard) payload.getObject()).CellOrCard()) {
+                        case 0: // карта
+                            switch (((CardActor) payload.getDragActor()).getFamilyType()) {
+                                case BUILDING:
+                                case UPGRAGE:
+                                    Singleton.getBuildingCards().add(((CardActor) payload.getObject()));
+                                    ((CardActor) payload.getObject()).addAction(moveTo(WIDTH_BUTTON + PADDING + CARD_WIDTH * (Singleton.getBuildingCards().size() - 1), 0, 0.1f));
+                                    break;
+                                case CRAFTING:
+                                    Singleton.getCraftingCards().add(((CardActor) payload.getObject()));
+                                    ((CardActor) payload.getObject()).addAction(moveTo(CARD_WIDTH * (Singleton.getCraftingCards().size() - 1), HEIGHT_CRAFTING_HAND, 0.1f));
+                                    break;
+                            }
+                            break;
+                        case 1://ячейка
+                            ((CellActor) getActor()).clearCell();  //очищаем клетку
+                            switch (((CardActor) payload.getDragActor()).getFamilyType()) {
+                                case BUILDING:
+                                    Singleton.addBuildingCard((CardActor) payload.getDragActor());
+                                    break;
+                                case CRAFTING:
+                                    Singleton.addcraftingcard((CardActor) payload.getDragActor());//отправляем карту назад в руку
+                                    break;
+                                case UPGRAGE:
+                                    Singleton.addBuildingCard((CardActor) payload.getDragActor());
+                                    break;
+                            }
+
+                            CardActor card = ((CellActor) payload.getObject()).getBuildingCardActor();
+                            if (card != null) {
+                                card.addAction(moveTo(WIDTH_BUTTON + PADDING + CARD_WIDTH * (Singleton.getBuildingCards().size() - 1), 0, 0.1f));
+                            }
+                            break;
                     }
-                    @Override
-                    public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-                        if(target==null) {
-                            Singleton.addBuildingCard((CardActor) payload.getDragActor());//отправляем карту назад в руку
-                            Singleton.getDADToHand().removeSource(this);
-                            Singleton.getDADToField().addTarget(((CellActor)getActor()).getTarget());
-                        }
-                    }
-                }; break;
-            case CRAFTCELLCARDSOURCE:
-                source = new DragAndDrop.Source(actor) {
-                    @Override
-                    public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-                        DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                        payload.setObject(getActor());
-                        payload.setDragActor(((CellActor)getActor()).getBuildingCardActor());
-                        ((CellActor)getActor()).removeCartActor();
-                        Singleton.getCardsInCraftingSlots().remove((CardActor) payload.getDragActor());// убираем карту с крафта
-                        ((CellActor)getActor()).setPlacedObjImg(((CellActor)getActor()).getDrawableClear());//todo
-                        return payload;
-                    }
-                    @Override
-                    public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-                        if(target==null) {
-                            Singleton.addcraftingcard((CardActor) payload.getDragActor());//отправляем карту назад в руку
-                            Singleton.getDADToWorkshopHand().removeSource(this);				//убираем возможность перетаскивать карту
-                            Singleton.getDADWorkshop().addTarget(((CellActor)getActor()).getTarget());// возвращаем возможност ставить карты на клетку
-                        }
-                    }
-                }; break;
-        }
-        return source;
+                }
+            }
+        };
     }
     public static final int FIELDTARGET = 10;
     public static final int WORKSHOPTARGET = 11;
@@ -165,23 +128,20 @@ public class Factory {
             case FIELDTARGET:
                 target = new DragAndDrop.Target(actor) {
                     public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                        getActor().setColor(Color.GREEN);
+                        getActor().setColor(Color.GREEN);//todo подсвечивать строку и столбец как в растениях против зомби
                         return true;
                     }
-
-                    public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
+                    public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {//todo убирать эту подстветку
                         getActor().setColor(Color.WHITE);
                     }
-
                     public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                        ((CellActor)getActor()).setPlacedObjImg(skin,((CardActor) payload.getObject()).getDrawableName());//устанавливаем картинку поставленной картинки
-                        ((Building) payload.getObject()).setOccupiedCell((FieldCellActor) getActor());
-                        ((CardActor) payload.getObject()).remove();										//убираем актера со сцены
-                        ((CellActor)getActor()).setBuildingCardActor((CardActor) payload.getObject());	//устанавливаем карту
-                        ((FieldCellActor)getActor()).setBuilding((Building) payload.getObject());		//устанавливаем постройку
-                        Singleton.getDADToHand().addSource(((CellActor)getActor()).getSource());	//добавляем возможность передвигать
-                        Singleton.getDADToField().removeTarget(this);								//убираем возможность ставить на клетку карту
-                        System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);	// debag
+                        ((CellActor) getActor()).setPlacedObjImg(skin, ((CardActor) payload.getDragActor()).getDrawableName());//устанавливаем картинку поставленной картинки
+                        ((Building) ( payload.getDragActor())).setOccupiedCell((FieldCellActor) getActor());
+                        payload.getDragActor().remove();                                        //убираем актера со сцены
+                        ((CellActor) getActor()).setBuildingCardActor(((CardActor) payload.getDragActor()));    //устанавливаем карту
+                        ((FieldCellActor) getActor()).setBuilding((Building) payload.getDragActor());        //устанавливаем постройку
+                        Singleton.getDADToField().addSource(((CellActor) getActor()).getSource());    //добавляем возможность передвигать
+                        Singleton.getDADToField().removeTarget(this);                                //убираем возможность ставить на клетку карту
                     }
                 };break;
             case WORKSHOPTARGET:
@@ -190,19 +150,16 @@ public class Factory {
                         getActor().setColor(Color.GREEN);
                         return true;
                     }
-
                     public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
                         getActor().setColor(Color.WHITE);
                     }
-
                     public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                        ((CellActor)getActor()).setPlacedObjImg(skin,((CardActor) payload.getObject()).getDrawableName());//устанавливаем картинку поставленной картинки
-                        ((CardActor)payload.getObject()).remove();// убираем актера со сцены
-                        ((CellActor)getActor()).setBuildingCardActor((CardActor) payload.getObject());//устанавливаем карту
-                        Singleton.getCardsInCraftingSlots().add((CardActor) payload.getObject());//добавляем карту в крафт
-                        Singleton.getDADToWorkshopHand().addSource(((CellActor)getActor()).getSource());//добавляем возможность передвигать
-                        Singleton.getDADWorkshop().removeTarget(this);//убираем возможность ставить на клетку карту
-                        System.out.println("Accepted: " + payload.getObject() + " " + x + ", " + y);// debag
+                        ((CellActor)getActor()).setPlacedObjImg(skin,((CardActor) payload.getDragActor()).getDrawableName());//устанавливаем картинку поставленной картинки
+                        ((CardActor)payload.getDragActor()).remove();// убираем актера со сцены
+                        ((CellActor)getActor()).setBuildingCardActor((CardActor) payload.getDragActor());//устанавливаем карту
+                        Singleton.getCardsInCraftingSlots().add((CardActor) payload.getDragActor());//добавляем карту в крафт
+                        Singleton.getDADToField().addSource(((CellActor)getActor()).getSource());//добавляем возможность передвигать
+                        Singleton.getDADToField().removeTarget(this);//убираем возможность ставить на клетку карту
                     }
                 }; break;
         }

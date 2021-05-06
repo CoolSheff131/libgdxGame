@@ -2,14 +2,28 @@ package com.mygdx.game.gamescreen.cells;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.mygdx.game.gamescreen.Singleton;
+import com.mygdx.game.gamescreen.cards.CardActor;
 import com.mygdx.game.gamescreen.cards.Factory;
 
 public class CraftingCellActor extends CellActor{
     public CraftingCellActor(Skin skin, String drawableName,int size) {
         super(skin, drawableName,size);
         target = Factory.createTarget(Factory.WORKSHOPTARGET,this);
-        source = Factory.createSource(Factory.CRAFTCELLCARDSOURCE,this);
+        source = Factory.createSource(this);
+
     }
+
+    @Override
+    public void clearCell() {
+        Singleton.getCardsInCraftingSlots().remove(buildingCardActor);
+        buildingCardActor = null;
+        placedCraftingCard.setDrawable(getDrawableClear());
+        Singleton.getDADToField().addTarget(getTarget());
+
+        //todo убирать из крафта
+    }
+
     @Override
     public DragAndDrop.Target getTarget() {
         if(target == null){
@@ -19,14 +33,7 @@ public class CraftingCellActor extends CellActor{
     }
     @Override
     public DragAndDrop.Source getSource() {
-        if(source == null){
-            source = Factory.createSource(Factory.CRAFTCELLCARDSOURCE,this);
-        }
-        return source;
-    }
 
-    public void clearBuilding(){
-        removeCartActor();
-        setPlacedObjImg(getDrawableClear());
+        return source;
     }
 }

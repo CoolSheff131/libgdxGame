@@ -1,9 +1,8 @@
 package com.mygdx.game.gamescreen.cards.resource;
 
-import com.mygdx.game.gamescreen.Items;
-import com.mygdx.game.gamescreen.cards.CardActor;
+import com.mygdx.game.gamescreen.cards.Items;
 
-public class WorkerCardActor extends CardActor {
+public class WorkerCardActor extends Crafting{
     public WorkerCardActor() {
         super("worker","worker");
     }

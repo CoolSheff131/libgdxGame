@@ -1,4 +1,4 @@
-package com.mygdx.game.gamescreen;
+package com.mygdx.game.gamescreen.cards;
 
 public enum Items {
     SCHEME_CARD,

@@ -1,18 +1,20 @@
 package com.mygdx.game.gamescreen.cards;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.mygdx.game.MainMenuScreen;
-import com.mygdx.game.gamescreen.Items;
 
 import static com.mygdx.game.gamescreen.GameScreen.CARD_WIDTH;
 import static com.mygdx.game.gamescreen.GameScreen.skin;
 
-public abstract class CardActor extends Group {
+public abstract class CardActor extends Group implements CellOrCard {
+    @Override
+    public int CellOrCard() {
+        return 0;
+    }
 
     private DragAndDrop.Source source;
     private Label lblName,lblDescription;
@@ -49,4 +51,6 @@ public abstract class CardActor extends Group {
     public abstract String getDrawableName();
 
     public abstract Items getItemType();
+
+    public abstract Family getFamilyType();
 }

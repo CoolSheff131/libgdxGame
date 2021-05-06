@@ -11,7 +11,15 @@ public class FieldCellActor extends CellActor{
     public FieldCellActor(Skin skin, String drawableName,int size) {
         super(skin, drawableName,size);
         target = Factory.createTarget(Factory.FIELDTARGET,this);
-        source = Factory.createSource(Factory.FieldCellCardSource,this);
+        source = Factory.createSource(this);
+    }
+
+    @Override
+    public void clearCell() {
+        building = null;
+        buildingCardActor = null;
+        placedCraftingCard.setDrawable(getDrawableClear());
+        Singleton.getDADToField().addTarget(getTarget());
     }
 
     public void doEndTurnThing() {
@@ -29,21 +37,9 @@ public class FieldCellActor extends CellActor{
 
     @Override
     public DragAndDrop.Source getSource() {
-        if(source == null){
-            source = Factory.createSource(Factory.FieldCellCardSource,this);
-        }
         return source;
     }
     public void setBuilding(Building building) {
         this.building = building;
-    }
-    public void removeBuilding(){
-        building = null;
-    }
-    public void clearBuilding(){
-        removeCartActor();
-        removeBuilding();//убираем постройку с КЛЕТКИ (актера) поля
-        placedCraftingCard.setDrawable(getDrawableClear());
-        Singleton.getDADToField().addTarget(getTarget());
     }
 }

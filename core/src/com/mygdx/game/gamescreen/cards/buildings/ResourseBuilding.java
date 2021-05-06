@@ -1,6 +1,6 @@
 package com.mygdx.game.gamescreen.cards.buildings;
 
-import com.mygdx.game.gamescreen.Items;
+import com.mygdx.game.gamescreen.cards.Items;
 import com.mygdx.game.gamescreen.Singleton;
 import com.mygdx.game.gamescreen.cards.Factory;
 

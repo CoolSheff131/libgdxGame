@@ -28,6 +28,7 @@ import com.mygdx.game.MainMenuScreen;
 import com.mygdx.game.MotherBoardCard;
 import com.mygdx.game.gamescreen.cards.CardActor;
 import com.mygdx.game.gamescreen.cards.Factory;
+import com.mygdx.game.gamescreen.cards.Items;
 import com.mygdx.game.gamescreen.cells.CellActor;
 import com.mygdx.game.gamescreen.cells.CraftingCellActor;
 import com.mygdx.game.gamescreen.cells.FieldCellActor;
@@ -38,8 +39,8 @@ public class GameScreen implements Screen {
 	private MotherBoardCard game;
 	private OrthographicCamera camera;
  	public static Skin skin;
- 	static{
-		skin = new Skin();//загрузка текстур
+ 	static{//загрузка текстур
+		skin = new Skin();
 		skin.add("fieldCell", new Texture("sprites/FieldCellImg.png"));
 		skin.add("badlogic", new Texture("heart.png"));
 		skin.add("coem", new Texture("sprites/coem.png"));
@@ -87,8 +88,6 @@ public class GameScreen implements Screen {
 		skin.add("craftM", new Texture("sprites/craftMachine.png"));
 		skin.add("wood", new Texture("sprites/Wood.png"));
 		skin.add("craftCell", new Texture("sprites/CraftingCell.png"));
-
-
 	}
 
 	private Stage stage;
@@ -121,7 +120,6 @@ public class GameScreen implements Screen {
 		setBtnListeners();
 		setActorsBounds();
 
-
 		stage.addActor(fieldGroup);
 		stage.addActor(workshop);
 		stage.addActor(toWorkshopBtn);
@@ -132,7 +130,6 @@ public class GameScreen implements Screen {
 		pauseBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-
 				btnSound.play();
 				if (!onPause) {
 					endLabel.setText("PAUSE");
@@ -140,14 +137,12 @@ public class GameScreen implements Screen {
 					onPause =!onPause;
 					pauseBtn.getStyle().up = skin.getDrawable("resume");
 					pauseBtn.getStyle().down = skin.getDrawable("resumePressed");
-
 				}else{
 					endGroup.remove();
 					pauseBtn.getStyle().up = skin.getDrawable("pause");
 					pauseBtn.getStyle().down = skin.getDrawable("pausePressed");
 					onPause =!onPause;
 				}
-
 				return super.touchDown(event, x, y, pointer, button);
 			}
 		});
@@ -371,7 +366,7 @@ public class GameScreen implements Screen {
 		for (int i = 0; i < craftingCells.length ; i++) {
 			craftingCells[i] = new CraftingCellActor(skin, "craftCell",WIDTH_SCREEN/4*2/3);
 			craftingTable.add(craftingCells[i]).grow();
-			Singleton.getDADWorkshop().addTarget(Factory.createTarget(Factory.WORKSHOPTARGET,craftingCells[i]));
+			Singleton.getDADToField().addTarget(Factory.createTarget(Factory.WORKSHOPTARGET,craftingCells[i]));
 		}
 		craftingTable.setDebug(true);
 		craftingRes = new Container<>();
@@ -386,10 +381,10 @@ public class GameScreen implements Screen {
 
 		woodenTable.setBounds(0,0,WIDTH_SCREEN,HEIGHT_SCREEN);
 		craftingRes.setBounds(WIDTH_SCREEN/4*3,HEIGH_FIELD/3,WIDTH_SCREEN/4,HEIGH_FIELD/3*2);
-		for (int i =0; i < 4;i++)	Singleton.addcraftingcard(Factory.createCard(Items.RESOURSE_CARD)); //Добавление карт в руку
-		Singleton.addcraftingcard(Factory.createCard(Items.SCHEME_CARD));
-		Singleton.addcraftingcard(Factory.createCard(Items.WORKER_CARD));
-		Singleton.getDADWorkshop().setDragActorPosition(CARD_WIDTH/2, -CARD_WIDTH/2);
+		for (int i =0; i < 4;i++)	Singleton.addcraftingcard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.RESOURSE_CARD)); //Добавление карт в руку
+		Singleton.addcraftingcard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.SCHEME_CARD));
+		Singleton.addcraftingcard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.WORKER_CARD));
+
 	}
 	private Group makeInfo() {
 		Group group = new Group();
@@ -408,18 +403,15 @@ public class GameScreen implements Screen {
 	}
 	private void clearCraftingCells(){
 		for (CellActor cell: craftingCells ) {
-			cell.setPlacedObjImg(skin,"craftCell");
-			cell.removeCartActor();
-			Singleton.getDADWorkshop().addTarget(Factory.createTarget(Factory.WORKSHOPTARGET,cell));
+			cell.clearCell();
 		}
 		Singleton.getCardsInCraftingSlots().clear();
 	}
 	private void restart(){
 		pauseBtn.setTouchable(Touchable.enabled);
-		Singleton.getDADToHand().clear();
+
 		Singleton.getDADToField().clear();
-		Singleton.getDADToWorkshopHand().clear();
-		Singleton.getDADWorkshop().clear();
+
 
 
 		pauseBtn.getStyle().up = skin.getDrawable("pause");
@@ -435,14 +427,14 @@ public class GameScreen implements Screen {
 		Singleton.clearHandCrafting();
 		Singleton.clearHandBuilding();
 		fillStartHandBuild();
-		for (int i =0; i < 4;i++)	Singleton.addcraftingcard(Factory.createCard(Items.RESOURSE_CARD)); //Добавление карт в руку
-		Singleton.addcraftingcard(Factory.createCard(Items.SCHEME_CARD));
+		for (int i =0; i < 4;i++)	Singleton.addcraftingcard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.RESOURSE_CARD)); //Добавление карт в руку
+		Singleton.addcraftingcard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.SCHEME_CARD));
 		endGroup.remove();
 	}
 	private void clearField(){
 		for(FieldCellActor fieldRow[]: fieldCells)
 			for(FieldCellActor fieldCell: fieldRow)
-				fieldCell.clearBuilding();
+				fieldCell.clearCell();
 	}
 	private void setActorsBounds(){
 		field.setBounds(WIDTH_SCREEN/2-WIDTH_SCREEN/3*2/2,HEIGHT_SCREEN/2-HEIGH_FIELD/2, WIDTH_SCREEN/3*2,HEIGH_FIELD);
@@ -450,7 +442,7 @@ public class GameScreen implements Screen {
 		fieldGroup.setBounds(0,0, WIDTH_SCREEN,HEIGH_FIELD);
 		info.setBounds(0,HEIGHT_HAND+PADDING+HEIGH_FIELD, WIDTH_SCREEN,HEIGHT_INFO);
 		workshop.setBounds(-WIDTH_SCREEN,0, WIDTH_SCREEN,HEIGH_FIELD);
-		endTurnBtn.setBounds(WIDTH_SCREEN/3*2,0,HEIGH_FIELD/6,HEIGH_FIELD/6);
+		endTurnBtn.setBounds(WIDTH_SCREEN/4*3,HEIGH_FIELD/3,HEIGH_FIELD/6,HEIGH_FIELD/6);
 		endGroup.setBounds(0,0,WIDTH_SCREEN,HEIGHT_HAND+PADDING+HEIGH_FIELD);
 	}
 
@@ -465,11 +457,11 @@ public class GameScreen implements Screen {
 		if(Gdx.input.isKeyPressed(Input.Keys.E))camera.rotate(1, 0, 0, 1);
 	}
 	private void fillStartHandBuild() {
-		Singleton.addBuildingCard(Factory.createCard(Items.ENERGY_BUILDING));
-		Singleton.addBuildingCard(Factory.createCard(Items.ENERGY_BUILDING));
-		Singleton.addBuildingCard(Factory.createCard(Items.ENERGY_BUILDING));
-		Singleton.addBuildingCard(Factory.createCard(Items.RESOURSE_BUILDING));
-		Singleton.addBuildingCard(Factory.createCard(Items.WORKER_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.ENERGY_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.ENERGY_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.ENERGY_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.RESOURSE_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.WORKER_BUILDING));
 		Singleton.addBuildingCard(Factory.createCard(Items.SCHEME_BUILDING));
 	}
 

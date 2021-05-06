@@ -14,7 +14,7 @@ import static com.mygdx.game.gamescreen.GameScreen.WIDTH_BUTTON;
 public class Singleton {
 
 
-    private static DragAndDrop DADToField = new DragAndDrop(), DADWorkshop = new DragAndDrop(), DADToHand = new DragAndDrop(), DADToWorkshopHand = new DragAndDrop();
+    private static DragAndDrop DADToField = new DragAndDrop();
     private static ArrayList<CardActor> buildingCards = new ArrayList<>(), craftingCards = new ArrayList<>(), cardsInCraftingSlots = new ArrayList<>();
     private static Stage stage = new Stage();
     private static Group workshop = new Group();
@@ -31,7 +31,7 @@ public class Singleton {
     }
     public static void addcraftingcard(CardActor cardActor){
         if(craftingCards.size() <= MAX_CRAFT_CARDS ){
-        DADWorkshop.addSource(cardActor.getSource());
+            DADToField.addSource(cardActor.getSource());
         workshop.addActor(cardActor);
         craftingCards.add(cardActor);
         cardActor.setBounds(CARD_WIDTH * (Singleton.getCraftingCards().size() - 1),CARD_WIDTH+PADDING,CARD_WIDTH,CARD_WIDTH);
@@ -90,26 +90,6 @@ public class Singleton {
         return DADToField;
     }
 
-    public static DragAndDrop getDADWorkshop() {
-        if(DADWorkshop == null){
-            DADWorkshop = new DragAndDrop();
-        }
-        return DADWorkshop;
-    }
-
-    public static DragAndDrop getDADToHand() {
-        if(DADToHand == null){
-            DADToHand = new DragAndDrop();
-        }
-        return DADToHand;
-    }
-
-    public static DragAndDrop getDADToWorkshopHand() {
-        if(DADToWorkshopHand == null){
-            DADToWorkshopHand = new DragAndDrop();
-        }
-        return DADToWorkshopHand;
-    }
 
     public static ArrayList<CardActor> getBuildingCards() {
         if (buildingCards == null){

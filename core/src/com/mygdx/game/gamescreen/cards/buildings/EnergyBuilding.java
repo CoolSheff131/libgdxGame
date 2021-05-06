@@ -1,8 +1,7 @@
 package com.mygdx.game.gamescreen.cards.buildings;
 
-import com.mygdx.game.MotherBoardCard;
 import com.mygdx.game.gamescreen.GameScreen;
-import com.mygdx.game.gamescreen.Items;
+import com.mygdx.game.gamescreen.cards.Items;
 
 public class EnergyBuilding extends Building{
     public EnergyBuilding() {

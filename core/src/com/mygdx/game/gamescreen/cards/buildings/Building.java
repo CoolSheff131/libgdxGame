@@ -3,6 +3,7 @@ package com.mygdx.game.gamescreen.cards.buildings;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.mygdx.game.gamescreen.Singleton;
 import com.mygdx.game.gamescreen.cards.CardActor;
+import com.mygdx.game.gamescreen.cards.Family;
 import com.mygdx.game.gamescreen.cells.FieldCellActor;
 
 import static com.mygdx.game.gamescreen.GameScreen.skin;
@@ -29,11 +30,16 @@ public abstract class Building extends CardActor {
         return super.getSource();
     }
 
+    @Override
+    public Family getFamilyType() {
+        return Family.BUILDING;
+    }
+
     protected void build(){
         isBuilded = true;
         if (occupiedCell != null){
             occupiedCell.setPlacedObjImg(skin,buildedName);
-            Singleton.getDADToHand().removeSource( occupiedCell.getSource());//Убираем возможность перетаскивать построенной
+            Singleton.getDADToField().removeSource( occupiedCell.getSource());//Убираем возможность перетаскивать построенной
         }
     }
 }
