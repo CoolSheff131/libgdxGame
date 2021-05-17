@@ -98,16 +98,18 @@ public class GameScreen implements Screen {
 	public static int WIDTH_SCREEN,HEIGHT_SCREEN , HEIGHT_HAND,HEIGH_FIELD,HEIGHT_INFO,PADDING,WIDTH_BUTTON,WIDTH_HAND, CARD_WIDTH,CELL_WIDTH = 100,HEIGHT_CRAFTING_HAND;
 	private final int FIELD_SIZE = 5,CRAFTING_SIZE = 3;
 	private boolean inFields,onPause;
-	private ShapeRenderer shapeRenderer;
 	private Table field;
 	private Container<Image>  craftingRes;
 	private CellActor[] craftingCells = new CellActor[CRAFTING_SIZE];
-	private FieldCellActor[][] fieldCells;
+	private static FieldCellActor[][] fieldCells;
 	public static int turn = 0;
 	private LevelInfo levelInfo;
 	private static int energy;
 	private Sound btnSound, craftSnd,wrongCraftSnd,winSnd,loseSnd;//todo вынести в media player
 
+	public static FieldCellActor[][] getFieldCells(){
+		return fieldCells;
+	}
 	private Image backgroundField,craftMachineImg,woodenTable;
 
 	public static void addEn(int en){
@@ -323,7 +325,7 @@ public class GameScreen implements Screen {
 		nextLvlBtn.getStyle().down = skin.getDrawable("nextPressed");
 		if(!isNextLvlAvailable())
 			nextLvlBtn.setVisible(false);
-		shapeRenderer = new ShapeRenderer();
+
 		fieldGroup = new Group();
 		field = makeField();
 
@@ -341,7 +343,7 @@ public class GameScreen implements Screen {
 	}
 
 	private Group makeEnd() {
-		Group group =new Group();
+		Group group = new Group();
 		Image menuPanel = new Image( new Texture("sprites/menuPanel.png"));
 		int WIDTH_MENU = WIDTH_SCREEN/3*2,HEIGHT_MENU = HEIGHT_HAND+PADDING+HEIGH_FIELD+PADDING;
 		int btnMenu_size = WIDTH_MENU/5;
@@ -362,7 +364,6 @@ public class GameScreen implements Screen {
 
 	private void makeWorkshop() {
 		Table craftingTable = new Table();//Создание поле крафта
-
 		for (int i = 0; i < craftingCells.length ; i++) {
 			craftingCells[i] = new CraftingCellActor(skin, "craftCell",WIDTH_SCREEN/4*2/3);
 			craftingTable.add(craftingCells[i]).grow();
@@ -409,11 +410,7 @@ public class GameScreen implements Screen {
 	}
 	private void restart(){
 		pauseBtn.setTouchable(Touchable.enabled);
-
 		Singleton.getDADToField().clear();
-
-
-
 		pauseBtn.getStyle().up = skin.getDrawable("pause");
 		pauseBtn.getStyle().down = skin.getDrawable("pausePressed");
 		onPause = false;
@@ -446,22 +443,12 @@ public class GameScreen implements Screen {
 		endGroup.setBounds(0,0,WIDTH_SCREEN,HEIGHT_HAND+PADDING+HEIGH_FIELD);
 	}
 
-	private void handleInput() {
-		if(Gdx.input.isKeyPressed(Input.Keys.A)) camera.zoom += 0.02;
-		if(Gdx.input.isKeyPressed(Input.Keys.Q)) camera.zoom -= 0.02;
-		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) camera.translate(-3, 0, 0);
-		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) camera.translate(3, 0, 0);
-		if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) camera.translate(0, -3, 0);
-		if(Gdx.input.isKeyPressed(Input.Keys.UP)) camera.translate(0, 3, 0);
-		if(Gdx.input.isKeyPressed(Input.Keys.W)) camera.rotate(-1, 0, 0, 1);
-		if(Gdx.input.isKeyPressed(Input.Keys.E))camera.rotate(1, 0, 0, 1);
-	}
-	private void fillStartHandBuild() {
-		Singleton.addBuildingCard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.ENERGY_BUILDING));
-		Singleton.addBuildingCard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.ENERGY_BUILDING));
-		Singleton.addBuildingCard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.ENERGY_BUILDING));
-		Singleton.addBuildingCard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.RESOURSE_BUILDING));
-		Singleton.addBuildingCard(Factory.createCard(com.mygdx.game.gamescreen.cards.Items.WORKER_BUILDING));
+	private void fillStartHandBuild() {//todo брать информацию о стартовой руке от посылки
+		Singleton.addBuildingCard(Factory.createCard(Items.ENERGY_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(Items.ENERGY_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(Items.ENERGY_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(Items.RESOURSE_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(Items.WORKER_BUILDING));
 		Singleton.addBuildingCard(Factory.createCard(Items.SCHEME_BUILDING));
 	}
 
@@ -470,7 +457,7 @@ public class GameScreen implements Screen {
 		fieldCells = new FieldCellActor[FIELD_SIZE][FIELD_SIZE];
 		for (int i = 0; i < fieldCells.length ; i++) {
 			for (int j = 0; j < fieldCells[i].length ; j++) {
-				fieldCells[i][j] = new FieldCellActor(skin, "fieldCell",HEIGH_FIELD/ FIELD_SIZE);
+				fieldCells[i][j] = new FieldCellActor(skin, "fieldCell",HEIGH_FIELD/ FIELD_SIZE,i,j);
 				fieldCells[i][j].setSize(CELL_WIDTH,CELL_WIDTH);
 				table.add(fieldCells[i][j]).size(HEIGH_FIELD/ FIELD_SIZE,HEIGH_FIELD/ FIELD_SIZE);
 				Singleton.getDADToField().addTarget(Factory.createTarget(Factory.FIELDTARGET,fieldCells[i][j]));
@@ -482,15 +469,8 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render (float delta) {
-		handleInput();
 		Gdx.gl.glClearColor(0.80f, 0.80f, 0.80f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-//		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);	//макет игрового экрана
-//		shapeRenderer.rect(0,0,WIDTH_BUTTON,HEIGHT_HAND);
-//		shapeRenderer.rect(WIDTH_BUTTON+PADDING,0,WIDTH_HAND,HEIGHT_HAND);
-//		shapeRenderer.rect(0,HEIGHT_HAND+PADDING, WIDTH_SCREEN,HEIGH_FIELD);
-//		shapeRenderer.rect(0,HEIGHT_HAND+PADDING+HEIGH_FIELD+PADDING, WIDTH_SCREEN,HEIGHT_INFO);
-//		shapeRenderer.end();
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
 	}

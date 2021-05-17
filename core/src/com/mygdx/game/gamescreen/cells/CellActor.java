@@ -17,37 +17,41 @@ public abstract class CellActor extends Group implements CellOrCard {
     protected CardActor buildingCardActor;
     protected DragAndDrop.Target target;
     protected DragAndDrop.Source source;
-    protected Image drawable,placedCraftingCard;
+    protected Image background,placedCraftingCard;
     public abstract DragAndDrop.Target getTarget();
     public abstract DragAndDrop.Source getSource();
-    public CellActor(Skin skin, String drawableName,int size){
+
+    public Image getBackground() {
+        return background;
+    }
+
+    public CellActor(Skin skin, String backgroundName, int size){
         super();
-        drawable = new Image(skin,drawableName);
-        placedCraftingCard = new Image(skin,drawableName);
-        drawable.setSize(size,size);
+        background = new Image(skin,backgroundName);
+        placedCraftingCard = new Image(skin,backgroundName);
+        background.setSize(size,size);
         placedCraftingCard.setSize(size,size);
-        addActor(drawable);
+        addActor(background);
         addActor(placedCraftingCard);
     }
 
 
-    public Drawable getDrawableClear() {
-        return drawable.getDrawable();
+    public Image getPlacedCraftingCard() {
+        return placedCraftingCard;
+    }
+
+    public Drawable getBackgroundDrawable() {
+        return background.getDrawable();
     }
 
     public void setBuildingCardActor(CardActor buildingCardActor) {
-
         this.buildingCardActor = buildingCardActor;
     }
 
     public abstract void clearCell();
 
-
     public void setPlacedObjImg(Skin skin, String drawable){
         this.placedCraftingCard.setDrawable(skin, drawable);
-    }
-    public void setPlacedObjImg(Drawable drawable){
-        this.placedCraftingCard.setDrawable(drawable);
     }
 
     public CardActor getBuildingCardActor() {

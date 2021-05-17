@@ -3,7 +3,7 @@ package com.mygdx.game.gamescreen.cards.buildings;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.mygdx.game.gamescreen.Singleton;
 import com.mygdx.game.gamescreen.cards.CardActor;
-import com.mygdx.game.gamescreen.cards.Family;
+import com.mygdx.game.gamescreen.cards.CardFamily;
 import com.mygdx.game.gamescreen.cells.FieldCellActor;
 
 import static com.mygdx.game.gamescreen.GameScreen.skin;
@@ -31,8 +31,8 @@ public abstract class Building extends CardActor {
     }
 
     @Override
-    public Family getFamilyType() {
-        return Family.BUILDING;
+    public CardFamily getFamilyType() {
+        return CardFamily.BUILDING;
     }
 
     protected void build(){

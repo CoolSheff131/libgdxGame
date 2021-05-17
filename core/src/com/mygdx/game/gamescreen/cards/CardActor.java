@@ -52,5 +52,5 @@ public abstract class CardActor extends Group implements CellOrCard {
 
     public abstract Items getItemType();
 
-    public abstract Family getFamilyType();
+    public abstract CardFamily getFamilyType();
 }

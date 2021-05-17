@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Null;
+import com.mygdx.game.gamescreen.GameScreen;
 import com.mygdx.game.gamescreen.cards.buildings.EnergyBuilding;
 import com.mygdx.game.gamescreen.cards.buildings.WorkerBuilding;
 import com.mygdx.game.gamescreen.cells.CellActor;
@@ -72,7 +73,6 @@ public class Factory {
                         payload.setObject(getActor());
                         payload.setDragActor(((CellActor) getActor()).getBuildingCardActor());  // Ставим перетаскиваемой рисунок на ячейке
                         ((CellActor) getActor()).clearCell();//убираем постройку с КЛЕТКИ (актера) поля
-                        ((CellActor) getActor()).setPlacedObjImg(((CellActor) getActor()).getDrawableClear());
                         Singleton.getDADToField().removeSource(this);
                         Singleton.getDADToField().addTarget(((CellActor) getActor()).getTarget());
                         break;
@@ -128,11 +128,37 @@ public class Factory {
             case FIELDTARGET:
                 target = new DragAndDrop.Target(actor) {
                     public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                        getActor().setColor(Color.GREEN);//todo подсвечивать строку и столбец как в растениях против зомби
+
+                        FieldCellActor fieldCellTarget = (FieldCellActor) getActor();
+                        fieldCellTarget.setColor(Color.GREEN);//todo подсвечивать строку и столбец как в растениях против зомби
+                        FieldCellActor[][] fieldCells = GameScreen.getFieldCells();
+                        for (int i = 0; i < fieldCells.length ; i++) {
+                            fieldCells[i][fieldCellTarget.getColumn()].getBackground().setColor(Color.GREEN);
+                            fieldCells[i][fieldCellTarget.getColumn()].getPlacedCraftingCard().setColor(Color.GREEN);
+                            System.out.println("as " + i);
+                        }
+                        for (int i = 0; i < fieldCells.length ; i++) {
+                            fieldCells[fieldCellTarget.getRow()][i].getBackground().setColor(Color.GREEN);
+                            fieldCells[fieldCellTarget.getRow()][i].getPlacedCraftingCard().setColor(Color.GREEN);
+                            System.out.println("as " + i);
+                        }
                         return true;
                     }
                     public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {//todo убирать эту подстветку
-                        getActor().setColor(Color.WHITE);
+                        FieldCellActor fieldCellTarget = (FieldCellActor) getActor();
+                        fieldCellTarget.setColor(Color.WHITE);
+                        FieldCellActor[][] fieldCells = GameScreen.getFieldCells();
+                        for (int i = 0; i < fieldCells.length ; i++) {
+                            fieldCells[i][fieldCellTarget.getColumn()].getBackground().setColor(Color.WHITE);
+                            fieldCells[i][fieldCellTarget.getColumn()].getPlacedCraftingCard().setColor(Color.WHITE);
+                            System.out.println("as " + i);
+                        }
+                        for (int i = 0; i < fieldCells.length ; i++) {
+                            fieldCells[fieldCellTarget.getRow()][i].getBackground().setColor(Color.WHITE);
+                            fieldCells[fieldCellTarget.getRow()][i].getPlacedCraftingCard().setColor(Color.WHITE);
+                            System.out.println("as " + i);
+                        }
+
                     }
                     public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                         ((CellActor) getActor()).setPlacedObjImg(skin, ((CardActor) payload.getDragActor()).getDrawableName());//устанавливаем картинку поставленной картинки

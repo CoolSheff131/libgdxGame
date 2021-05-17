@@ -3,7 +3,6 @@ package com.mygdx.game.gamescreen.cells;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.mygdx.game.gamescreen.Singleton;
-import com.mygdx.game.gamescreen.cards.CardActor;
 import com.mygdx.game.gamescreen.cards.Factory;
 
 public class CraftingCellActor extends CellActor{
@@ -18,7 +17,7 @@ public class CraftingCellActor extends CellActor{
     public void clearCell() {
         Singleton.getCardsInCraftingSlots().remove(buildingCardActor);
         buildingCardActor = null;
-        placedCraftingCard.setDrawable(getDrawableClear());
+        placedCraftingCard.setDrawable(getBackgroundDrawable());
         Singleton.getDADToField().addTarget(getTarget());
 
         //todo убирать из крафта

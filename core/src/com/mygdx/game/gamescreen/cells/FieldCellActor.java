@@ -8,17 +8,28 @@ import com.mygdx.game.gamescreen.cards.buildings.Building;
 
 public class FieldCellActor extends CellActor{
     private Building building;
-    public FieldCellActor(Skin skin, String drawableName,int size) {
+    private int row, column;
+    public FieldCellActor(Skin skin, String drawableName,int size, int row, int column) {
         super(skin, drawableName,size);
         target = Factory.createTarget(Factory.FIELDTARGET,this);
         source = Factory.createSource(this);
+        this.row = row;
+        this.column = column;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getColumn() {
+        return column;
     }
 
     @Override
     public void clearCell() {
         building = null;
         buildingCardActor = null;
-        placedCraftingCard.setDrawable(getDrawableClear());
+        placedCraftingCard.setDrawable(getBackgroundDrawable());
         Singleton.getDADToField().addTarget(getTarget());
     }
 
