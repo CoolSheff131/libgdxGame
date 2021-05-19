@@ -10,7 +10,6 @@ public class CraftingCellActor extends CellActor{
         super(skin, drawableName,size);
         target = Factory.createTarget(Factory.WORKSHOPTARGET,this);
         source = Factory.createSource(this);
-
     }
 
     @Override
@@ -18,21 +17,15 @@ public class CraftingCellActor extends CellActor{
         Singleton.getCardsInCraftingSlots().remove(buildingCardActor);
         buildingCardActor = null;
         placedCraftingCard.setDrawable(getBackgroundDrawable());
-        Singleton.getDADToField().addTarget(getTarget());
-
-        //todo убирать из крафта
+        Singleton.getDragAndDrop().addTarget(getTarget());
     }
 
     @Override
     public DragAndDrop.Target getTarget() {
-        if(target == null){
-            target = Factory.createTarget(Factory.WORKSHOPTARGET,this);
-        }
         return target;
     }
     @Override
     public DragAndDrop.Source getSource() {
-
         return source;
     }
 }

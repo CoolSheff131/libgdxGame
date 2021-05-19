@@ -16,7 +16,9 @@ public class FieldCellActor extends CellActor{
         this.row = row;
         this.column = column;
     }
-
+    public boolean isClear(){
+        return building == null;
+    }
     public int getRow() {
         return row;
     }
@@ -25,12 +27,16 @@ public class FieldCellActor extends CellActor{
         return column;
     }
 
+    public Building getBuilding() {
+        return building;
+    }
+
     @Override
     public void clearCell() {
         building = null;
         buildingCardActor = null;
         placedCraftingCard.setDrawable(getBackgroundDrawable());
-        Singleton.getDADToField().addTarget(getTarget());
+        Singleton.getDragAndDrop().addTarget(getTarget());
     }
 
     public void doEndTurnThing() {

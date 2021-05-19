@@ -1,7 +1,6 @@
 package com.mygdx.game.gamescreen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -88,6 +86,7 @@ public class GameScreen implements Screen {
 		skin.add("craftM", new Texture("sprites/craftMachine.png"));
 		skin.add("wood", new Texture("sprites/Wood.png"));
 		skin.add("craftCell", new Texture("sprites/CraftingCell.png"));
+		skin.add("quickBuild", new Texture("sprites/quickBuild.png"));
 	}
 
 	private Stage stage;
@@ -367,7 +366,7 @@ public class GameScreen implements Screen {
 		for (int i = 0; i < craftingCells.length ; i++) {
 			craftingCells[i] = new CraftingCellActor(skin, "craftCell",WIDTH_SCREEN/4*2/3);
 			craftingTable.add(craftingCells[i]).grow();
-			Singleton.getDADToField().addTarget(Factory.createTarget(Factory.WORKSHOPTARGET,craftingCells[i]));
+			Singleton.getDragAndDrop().addTarget(Factory.createTarget(Factory.WORKSHOPTARGET,craftingCells[i]));
 		}
 		craftingTable.setDebug(true);
 		craftingRes = new Container<>();
@@ -410,7 +409,7 @@ public class GameScreen implements Screen {
 	}
 	private void restart(){
 		pauseBtn.setTouchable(Touchable.enabled);
-		Singleton.getDADToField().clear();
+		Singleton.getDragAndDrop().clear();
 		pauseBtn.getStyle().up = skin.getDrawable("pause");
 		pauseBtn.getStyle().down = skin.getDrawable("pausePressed");
 		onPause = false;
@@ -450,6 +449,8 @@ public class GameScreen implements Screen {
 		Singleton.addBuildingCard(Factory.createCard(Items.RESOURSE_BUILDING));
 		Singleton.addBuildingCard(Factory.createCard(Items.WORKER_BUILDING));
 		Singleton.addBuildingCard(Factory.createCard(Items.SCHEME_BUILDING));
+		Singleton.addBuildingCard(Factory.createCard(Items.QUICKBUILD_UPGRADE));
+		Singleton.addBuildingCard(Factory.createCard(Items.QUICKBUILD_UPGRADE));
 	}
 
 	private Table makeField() {
@@ -460,7 +461,7 @@ public class GameScreen implements Screen {
 				fieldCells[i][j] = new FieldCellActor(skin, "fieldCell",HEIGH_FIELD/ FIELD_SIZE,i,j);
 				fieldCells[i][j].setSize(CELL_WIDTH,CELL_WIDTH);
 				table.add(fieldCells[i][j]).size(HEIGH_FIELD/ FIELD_SIZE,HEIGH_FIELD/ FIELD_SIZE);
-				Singleton.getDADToField().addTarget(Factory.createTarget(Factory.FIELDTARGET,fieldCells[i][j]));
+				Singleton.getDragAndDrop().addTarget(Factory.createTarget(Factory.FIELDTARGET,fieldCells[i][j]));
 			}
 			table.row();
 		}

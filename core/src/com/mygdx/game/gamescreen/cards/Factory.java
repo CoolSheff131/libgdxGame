@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.Null;
 import com.mygdx.game.gamescreen.GameScreen;
 import com.mygdx.game.gamescreen.cards.buildings.EnergyBuilding;
 import com.mygdx.game.gamescreen.cards.buildings.WorkerBuilding;
+import com.mygdx.game.gamescreen.cards.upgrades.QuickBuild;
+import com.mygdx.game.gamescreen.cards.upgrades.Upgrade;
 import com.mygdx.game.gamescreen.cells.CellActor;
 import com.mygdx.game.gamescreen.cells.FieldCellActor;
 import com.mygdx.game.gamescreen.Singleton;
@@ -32,10 +34,13 @@ public class Factory {
             case RESOURSE_CARD: cardActor = new ResourceCardActor(); break;
             case WORKER_CARD:cardActor = new WorkerCardActor(); break;
             case SCHEME_CARD:cardActor = new SchemeCardActor(); break;
+
             case RESOURSE_BUILDING:cardActor = new ResourseBuilding();break;
             case WORKER_BUILDING:cardActor = new WorkerBuilding();  break;
             case SCHEME_BUILDING: cardActor = new SchemeBuilding(); break;
             case ENERGY_BUILDING: cardActor = new EnergyBuilding(); break;
+
+            case QUICKBUILD_UPGRADE: cardActor = new QuickBuild(); break;
         }
         cardActor.setSource(createSource(cardActor));
         return cardActor;
@@ -73,8 +78,8 @@ public class Factory {
                         payload.setObject(getActor());
                         payload.setDragActor(((CellActor) getActor()).getBuildingCardActor());  // Ставим перетаскиваемой рисунок на ячейке
                         ((CellActor) getActor()).clearCell();//убираем постройку с КЛЕТКИ (актера) поля
-                        Singleton.getDADToField().removeSource(this);
-                        Singleton.getDADToField().addTarget(((CellActor) getActor()).getTarget());
+                        Singleton.getDragAndDrop().removeSource(this);
+                        Singleton.getDragAndDrop().addTarget(((CellActor) getActor()).getTarget());
                         break;
                 }
                 return payload;
@@ -128,46 +133,50 @@ public class Factory {
             case FIELDTARGET:
                 target = new DragAndDrop.Target(actor) {
                     public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                        CardActor cardActor = (CardActor) payload.getDragActor();
+                        if((cardActor.getFamilyType() == CardFamily.UPGRAGE   &&  !((FieldCellActor) getActor()).isClear() && ((Upgrade)cardActor).canDrop(((FieldCellActor) getActor()).getBuilding()))|| (cardActor.getFamilyType() == CardFamily.BUILDING &&  ((FieldCellActor) getActor()).isClear())) {
 
-                        FieldCellActor fieldCellTarget = (FieldCellActor) getActor();
-                        fieldCellTarget.setColor(Color.GREEN);//todo подсвечивать строку и столбец как в растениях против зомби
-                        FieldCellActor[][] fieldCells = GameScreen.getFieldCells();
-                        for (int i = 0; i < fieldCells.length ; i++) {
-                            fieldCells[i][fieldCellTarget.getColumn()].getBackground().setColor(Color.GREEN);
-                            fieldCells[i][fieldCellTarget.getColumn()].getPlacedCraftingCard().setColor(Color.GREEN);
-                            System.out.println("as " + i);
-                        }
-                        for (int i = 0; i < fieldCells.length ; i++) {
-                            fieldCells[fieldCellTarget.getRow()][i].getBackground().setColor(Color.GREEN);
-                            fieldCells[fieldCellTarget.getRow()][i].getPlacedCraftingCard().setColor(Color.GREEN);
-                            System.out.println("as " + i);
-                        }
-                        return true;
+                            FieldCellActor fieldCellTarget = (FieldCellActor) getActor();
+                            fieldCellTarget.setColor(Color.GREEN);
+                            FieldCellActor[][] fieldCells = GameScreen.getFieldCells();
+                            for (int i = 0; i < fieldCells.length; i++) {
+                                fieldCells[i][fieldCellTarget.getColumn()].getBackground().setColor(Color.GREEN);
+                                fieldCells[i][fieldCellTarget.getColumn()].getPlacedCraftingCard().setColor(Color.GREEN);
+                            }
+                            for (int i = 0; i < fieldCells.length; i++) {
+                                fieldCells[fieldCellTarget.getRow()][i].getBackground().setColor(Color.GREEN);
+                                fieldCells[fieldCellTarget.getRow()][i].getPlacedCraftingCard().setColor(Color.GREEN);
+                            }
+                            return true;
+                        }else
+                            return false;
                     }
-                    public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {//todo убирать эту подстветку
+                    public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
                         FieldCellActor fieldCellTarget = (FieldCellActor) getActor();
                         fieldCellTarget.setColor(Color.WHITE);
                         FieldCellActor[][] fieldCells = GameScreen.getFieldCells();
                         for (int i = 0; i < fieldCells.length ; i++) {
                             fieldCells[i][fieldCellTarget.getColumn()].getBackground().setColor(Color.WHITE);
                             fieldCells[i][fieldCellTarget.getColumn()].getPlacedCraftingCard().setColor(Color.WHITE);
-                            System.out.println("as " + i);
                         }
                         for (int i = 0; i < fieldCells.length ; i++) {
                             fieldCells[fieldCellTarget.getRow()][i].getBackground().setColor(Color.WHITE);
                             fieldCells[fieldCellTarget.getRow()][i].getPlacedCraftingCard().setColor(Color.WHITE);
-                            System.out.println("as " + i);
                         }
 
                     }
                     public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                        ((CellActor) getActor()).setPlacedObjImg(skin, ((CardActor) payload.getDragActor()).getDrawableName());//устанавливаем картинку поставленной картинки
-                        ((Building) ( payload.getDragActor())).setOccupiedCell((FieldCellActor) getActor());
-                        payload.getDragActor().remove();                                        //убираем актера со сцены
-                        ((CellActor) getActor()).setBuildingCardActor(((CardActor) payload.getDragActor()));    //устанавливаем карту
-                        ((FieldCellActor) getActor()).setBuilding((Building) payload.getDragActor());        //устанавливаем постройку
-                        Singleton.getDADToField().addSource(((CellActor) getActor()).getSource());    //добавляем возможность передвигать
-                        Singleton.getDADToField().removeTarget(this);                                //убираем возможность ставить на клетку карту
+                        CardActor cardActor = (CardActor) payload.getDragActor();
+                        if(cardActor.getFamilyType() == CardFamily.BUILDING) {
+                            ((CellActor) getActor()).setPlacedObjImg(skin, ((CardActor) payload.getDragActor()).getDrawableName());//устанавливаем картинку поставленной картинки
+                            ((Building) (payload.getDragActor())).setOccupiedCell((FieldCellActor) getActor());
+                            ((CellActor) getActor()).setBuildingCardActor(((CardActor) payload.getDragActor()));    //устанавливаем карту
+                            ((FieldCellActor) getActor()).setBuilding((Building) payload.getDragActor());        //устанавливаем постройку
+                            Singleton.getDragAndDrop().addSource(((CellActor) getActor()).getSource());    //добавляем возможность передвигать
+                        }else if(cardActor.getFamilyType() == CardFamily.UPGRAGE){
+                            ((Upgrade)cardActor).dropDo(((FieldCellActor) getActor()).getBuilding());
+                        }
+                        payload.getDragActor().remove(); //убираем актера со сцены
                     }
                 };break;
             case WORKSHOPTARGET:
@@ -184,8 +193,8 @@ public class Factory {
                         ((CardActor)payload.getDragActor()).remove();// убираем актера со сцены
                         ((CellActor)getActor()).setBuildingCardActor((CardActor) payload.getDragActor());//устанавливаем карту
                         Singleton.getCardsInCraftingSlots().add((CardActor) payload.getDragActor());//добавляем карту в крафт
-                        Singleton.getDADToField().addSource(((CellActor)getActor()).getSource());//добавляем возможность передвигать
-                        Singleton.getDADToField().removeTarget(this);//убираем возможность ставить на клетку карту
+                        Singleton.getDragAndDrop().addSource(((CellActor)getActor()).getSource());//добавляем возможность передвигать
+                        Singleton.getDragAndDrop().removeTarget(this);//убираем возможность ставить на клетку карту
                     }
                 }; break;
         }

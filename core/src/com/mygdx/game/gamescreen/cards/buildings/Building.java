@@ -35,11 +35,15 @@ public abstract class Building extends CardActor {
         return CardFamily.BUILDING;
     }
 
-    protected void build(){
-        isBuilded = true;
+    public boolean isBuilded() {
+        return isBuilded;
+    }
+
+    public void build(){
+        isBuilded = true;//ДОБАВИТЬ КОЛИЧЕСТВО ХОДОВ ДЛЯ ПОСТРОЙКИ
         if (occupiedCell != null){
             occupiedCell.setPlacedObjImg(skin,buildedName);
-            Singleton.getDADToField().removeSource( occupiedCell.getSource());//Убираем возможность перетаскивать построенной
+            Singleton.getDragAndDrop().removeSource( occupiedCell.getSource());//Убираем возможность перетаскивать построенной
         }
     }
 }
