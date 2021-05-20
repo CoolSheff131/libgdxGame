@@ -16,7 +16,7 @@ public class LevelManager {
         levelInfos.add(levelInfo);
     }
     public static LevelInfo getLevel(int indexLevel){
-        if (indexLevel == levelInfos.size())  // Если уровень последний
+        if (indexLevel >= levelInfos.size())  // Если уровень последний
             return null;
         return levelInfos.get(indexLevel);
     }

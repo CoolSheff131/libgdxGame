@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mygdx.game.LevelInfo;
 import com.mygdx.game.LevelManager;
 import com.mygdx.game.MainMenuScreen;
+import com.mygdx.game.MediaPlayer;
 import com.mygdx.game.MotherBoardCard;
 import com.mygdx.game.gamescreen.cards.CardActor;
 import com.mygdx.game.gamescreen.cards.Factory;
@@ -63,8 +64,6 @@ public class GameScreen implements Screen {
 		skin.add("pause", new Texture("sprites/ButtonPause.png"));
 		skin.add("pausePressed", new Texture("sprites/ButtonPausePressed.png"));
 
-
-
 		skin.add("left", new Texture("sprites/ButtonLeftArrow.png"));
 		skin.add("leftPressed", new Texture("sprites/ButtonLeftArrowPressed.png"));
 		skin.add("right", new Texture("sprites/ButtonRightArrow.png"));
@@ -79,11 +78,9 @@ public class GameScreen implements Screen {
 		skin.add("resumePressed", new Texture("sprites/ButtonPlayPressed.png"));
 		skin.add("next", new Texture("sprites/ButtonNext.png"));
 		skin.add("nextPressed", new Texture("sprites/ButtonNextPressed.png"));
-
 		skin.add("bgn", new Texture("sprites/BgnMother.png"));
 		skin.add("bgnInfo", new Texture("sprites/BgnInfo.png"));
-
-		skin.add("craftM", new Texture("sprites/craftMachine.png"));
+		skin.add("craftM", new Texture("sprites/CraftMachine.png"));
 		skin.add("wood", new Texture("sprites/Wood.png"));
 		skin.add("craftCell", new Texture("sprites/CraftingCell.png"));
 		skin.add("quickBuild", new Texture("sprites/quickBuild.png"));
@@ -104,7 +101,7 @@ public class GameScreen implements Screen {
 	public static int turn = 0;
 	private LevelInfo levelInfo;
 	private static int energy;
-	private Sound btnSound, craftSnd,wrongCraftSnd,winSnd,loseSnd;//todo вынести в media player
+
 
 	public static FieldCellActor[][] getFieldCells(){
 		return fieldCells;
@@ -114,24 +111,28 @@ public class GameScreen implements Screen {
 	public static void addEn(int en){
 		energy+=en;
 	}
-	public GameScreen (MotherBoardCard game, LevelInfo levelInfo) {
+
+	public void setLevelInfo(LevelInfo levelInfo) {
+		this.levelInfo = levelInfo;
+	}
+
+	public GameScreen (MotherBoardCard game,LevelInfo levelInfo) {
 		this.levelInfo = levelInfo;
 		this.game = game;
 		init();
 		setBtnListeners();
 		setActorsBounds();
-
 		stage.addActor(fieldGroup);
 		stage.addActor(workshop);
 		stage.addActor(toWorkshopBtn);
 		stage.addActor(info);
-		fillStartHandBuild();
+		restart();
 	}
 	private void setBtnListeners(){
 		pauseBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				btnSound.play();
+				MediaPlayer.playBtn();
 				if (!onPause) {
 					endLabel.setText("PAUSE");
 					stage.addActor(endGroup);
@@ -151,7 +152,7 @@ public class GameScreen implements Screen {
 		nextLvlBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				btnSound.play();
+				MediaPlayer.playBtn();
 				levelInfo = LevelManager.getLevel(levelInfo.getIndex() + 1);
 				if(!isNextLvlAvailable())
 					nextLvlBtn.setVisible(false);
@@ -163,8 +164,7 @@ public class GameScreen implements Screen {
 		restartBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				btnSound.play();
-				System.out.println("restart");
+				MediaPlayer.playBtn();
 				restart();
 				return super.touchDown(event, x, y, pointer, button);
 				
@@ -174,8 +174,7 @@ public class GameScreen implements Screen {
 		exitBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				btnSound.play();
-				System.out.println("exit");
+				MediaPlayer.playBtn();
 				game.setScreen(new MainMenuScreen(game));
 				dispose();
 				return super.touchDown(event, x, y, pointer, button);
@@ -185,7 +184,7 @@ public class GameScreen implements Screen {
 		endTurnBtn.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				btnSound.play();
+				MediaPlayer.playBtn();
 				turn++;
 				for (FieldCellActor[] fieldRow: fieldCells) {
 					for(FieldCellActor fieldCell: fieldRow){
@@ -196,7 +195,7 @@ public class GameScreen implements Screen {
 				enLabel.setText("en: "+ energy+"/"+levelInfo.getNeedResources());
 				if(energy >= levelInfo.getNeedResources()){
 					pauseBtn.setTouchable(Touchable.disabled);
-					winSnd.play();
+					MediaPlayer.playWinSnd();
 					endLabel.setText("YOU WIN!");
 					stage.addActor(endGroup);
 					if(LevelManager.getLevel(levelInfo.getIndex() + 1) != null)
@@ -205,7 +204,7 @@ public class GameScreen implements Screen {
 
 				}else if(turn >= levelInfo.getMaxTurn()){
 					pauseBtn.setTouchable(Touchable.disabled);
-					loseSnd.play();
+					MediaPlayer.playLoseSnd();
 					endLabel.setText("YOU LOSE");
 					stage.addActor(endGroup);
 				}
@@ -217,11 +216,12 @@ public class GameScreen implements Screen {
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				CardActor res = CraftingSystem.GetRecipeOutput(Singleton.getCardsInCraftingSlots());
 				if(res !=null){
-					craftSnd.play();
+					MediaPlayer.playCraftSnd();
+
 					clearCraftingCells();
 					Singleton.addBuildingCard(res);
 				}else {
-					wrongCraftSnd.play();
+					MediaPlayer.playWrongCraftSnd();
 				}
 				return super.touchDown(event, x, y, pointer, button);
 			}
@@ -230,7 +230,7 @@ public class GameScreen implements Screen {
 
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				btnSound.play();
+				MediaPlayer.playBtn();
 				if(inFields){
 					fieldGroup.addAction(moveBy(WIDTH_SCREEN,0,0.2f));
 					workshop.addAction(moveBy(WIDTH_SCREEN,0,0.2f));
@@ -251,7 +251,7 @@ public class GameScreen implements Screen {
 	}
 
 	private boolean isNextLvlAvailable() {//todo null pointer!!!
-		return LevelManager.getLevel(levelInfo.getIndex() + 1) != null && LevelManager.getLevel(levelInfo.getIndex() + 1).isOpen();
+		return levelInfo != null && LevelManager.getLevel(levelInfo.getIndex() + 1) != null && LevelManager.getLevel(levelInfo.getIndex() + 1).isOpen();
 	}
 
 	private void init(){
@@ -260,12 +260,6 @@ public class GameScreen implements Screen {
 		backgroundField = new Image(skin,"bgn");
 		craftMachineImg = new Image(skin,"craftM");
 		woodenTable = new Image(skin,"wood");
-
-		btnSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Btn1.mp3"));
-		craftSnd = Gdx.audio.newSound(Gdx.files.internal("sounds/craft.wav"));
-		wrongCraftSnd = Gdx.audio.newSound(Gdx.files.internal("sounds/wrongCraft.wav"));
-		winSnd = Gdx.audio.newSound(Gdx.files.internal("sounds/win.wav"));
-		loseSnd = Gdx.audio.newSound(Gdx.files.internal("sounds/lose.wav"));
 		energy = 0;
 
 		backgroundField.setSize(WIDTH_SCREEN,HEIGHT_SCREEN);
@@ -496,5 +490,7 @@ public class GameScreen implements Screen {
 	public void hide() {}
 
 	@Override
-	public void dispose () {		stage.dispose();	}
+	public void dispose () {
+		//stage.dispose();
+	}
 }
