@@ -1,11 +1,20 @@
 package com.mygdx.game.gamescreen.cards.upgrades;
 
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.mygdx.game.gamescreen.Singleton;
 import com.mygdx.game.gamescreen.cards.CardActor;
 import com.mygdx.game.gamescreen.cards.CardFamily;
 import com.mygdx.game.gamescreen.cards.Items;
 import com.mygdx.game.gamescreen.cards.buildings.Building;
 
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
+import static com.mygdx.game.gamescreen.GameScreen.CARD_WIDTH;
+import static com.mygdx.game.gamescreen.GameScreen.PADDING;
+import static com.mygdx.game.gamescreen.GameScreen.WIDTH_BUTTON;
+
 public abstract class Upgrade extends CardActor {
+
+
 
     public Upgrade(String drawableName, String name) {
         super(drawableName, name);

@@ -6,9 +6,14 @@ import com.mygdx.game.gamescreen.cards.CardActor;
 import com.mygdx.game.gamescreen.cards.CardFamily;
 import com.mygdx.game.gamescreen.cells.FieldCellActor;
 
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
+import static com.mygdx.game.gamescreen.GameScreen.CARD_WIDTH;
+import static com.mygdx.game.gamescreen.GameScreen.PADDING;
+import static com.mygdx.game.gamescreen.GameScreen.WIDTH_BUTTON;
 import static com.mygdx.game.gamescreen.GameScreen.skin;
 
 public abstract class Building extends CardActor {
+
     protected boolean isBuilded;
     private FieldCellActor occupiedCell;
     private String buildedName;
