@@ -9,6 +9,8 @@ import com.mygdx.game.gamescreen.GameScreen;
 import com.mygdx.game.gamescreen.IDragAndDrop;
 import com.mygdx.game.gamescreen.cards.buildings.EnergyBuilding;
 import com.mygdx.game.gamescreen.cards.buildings.WorkerBuilding;
+import com.mygdx.game.gamescreen.cards.upgrades.ActivateBuild;
+import com.mygdx.game.gamescreen.cards.upgrades.DemolishBuild;
 import com.mygdx.game.gamescreen.cards.upgrades.QuickBuild;
 import com.mygdx.game.gamescreen.cards.upgrades.Upgrade;
 import com.mygdx.game.gamescreen.cells.CellActor;
@@ -42,6 +44,8 @@ public class Factory {
             case ENERGY_BUILDING: cardActor = new EnergyBuilding(); break;
 
             case QUICKBUILD_UPGRADE: cardActor = new QuickBuild(); break;
+            case DEMOLISHBUILD_UPGRADE: cardActor = new DemolishBuild(); break;
+            case ACTIVATEBUILD_UPGRADE: cardActor = new ActivateBuild(); break;
         }
         cardActor.setSource(createSource(cardActor));
         return cardActor;

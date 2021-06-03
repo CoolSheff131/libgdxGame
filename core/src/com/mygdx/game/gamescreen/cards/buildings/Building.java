@@ -13,16 +13,22 @@ import static com.mygdx.game.gamescreen.GameScreen.WIDTH_BUTTON;
 import static com.mygdx.game.gamescreen.GameScreen.skin;
 
 public abstract class Building extends CardActor {
-
     protected boolean isBuilded;
     private FieldCellActor occupiedCell;
     private String buildedName;
+    private int buildTurns;
     public Building(String name,String buildedName) {
         super(buildedName,name);
         this.buildedName = buildedName;
         isBuilded = false;
+        buildTurns = 1;
     }
-
+    public Building(String name,String buildedName, int buildTurns) {
+        super(buildedName,name);
+        this.buildedName = buildedName;
+        isBuilded = false;
+        this.buildTurns = buildTurns;
+    }
     public void setOccupiedCell(FieldCellActor occupiedCell) {
         this.occupiedCell = occupiedCell;
     }
@@ -45,10 +51,20 @@ public abstract class Building extends CardActor {
     }
 
     public void build(){
-        isBuilded = true;//ДОБАВИТЬ КОЛИЧЕСТВО ХОДОВ ДЛЯ ПОСТРОЙКИ
-        if (occupiedCell != null){
-            occupiedCell.setPlacedObjImg(skin,buildedName);
-            Singleton.getDragAndDrop().removeSource( occupiedCell.getSource());//Убираем возможность перетаскивать построенной
+        buildTurns--;
+        if(buildTurns ==0) {
+            isBuilded = true;
+            if (occupiedCell != null) {
+                occupiedCell.setPlacedObjImg(skin, buildedName);
+                Singleton.getDragAndDrop().removeSource(occupiedCell.getSource());//Убираем возможность перетаскивать построенной
+            }
         }
+    }
+    public void demolish(){
+        if(occupiedCell !=null){
+            occupiedCell.clearCell();
+
+        }
+
     }
 }

@@ -84,6 +84,8 @@ public class GameScreen implements Screen {
 		skin.add("wood", new Texture("sprites/Wood.png"));
 		skin.add("craftCell", new Texture("sprites/CraftingCell.png"));
 		skin.add("quickBuild", new Texture("sprites/quickBuild.png"));
+		skin.add("demolishBuild", new Texture("sprites/demolishBuild.png"));
+		skin.add("activateBuild", new Texture("sprites/activateBuild.png"));
 	}
 
 	private Stage stage;
@@ -110,10 +112,6 @@ public class GameScreen implements Screen {
 
 	public static void addEn(int en){
 		energy+=en;
-	}
-
-	public void setLevelInfo(LevelInfo levelInfo) {
-		this.levelInfo = levelInfo;
 	}
 
 	public GameScreen (MotherBoardCard game,LevelInfo levelInfo) {
@@ -250,7 +248,7 @@ public class GameScreen implements Screen {
 		});
 	}
 
-	private boolean isNextLvlAvailable() {//todo null pointer!!!
+	private boolean isNextLvlAvailable() {
 		return levelInfo != null && LevelManager.getLevel(levelInfo.getIndex() + 1) != null && LevelManager.getLevel(levelInfo.getIndex() + 1).isOpen();
 	}
 
@@ -444,7 +442,10 @@ public class GameScreen implements Screen {
 		Singleton.addBuildingCard(Factory.createCard(Items.WORKER_BUILDING));
 		Singleton.addBuildingCard(Factory.createCard(Items.SCHEME_BUILDING));
 		Singleton.addBuildingCard(Factory.createCard(Items.QUICKBUILD_UPGRADE));
-		Singleton.addBuildingCard(Factory.createCard(Items.QUICKBUILD_UPGRADE));
+		Singleton.addBuildingCard(Factory.createCard(Items.ACTIVATEBUILD_UPGRADE));
+		Singleton.addBuildingCard(Factory.createCard(Items.ACTIVATEBUILD_UPGRADE));
+
+
 	}
 
 	private Table makeField() {
