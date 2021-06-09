@@ -54,10 +54,6 @@ public abstract class CellActor extends Group implements IDragAndDrop {
 
     }
 
-
-
-
-
     protected CardActor buildingCardActor;
     protected DragAndDrop.Target target;
     protected DragAndDrop.Source source;
@@ -97,7 +93,9 @@ public abstract class CellActor extends Group implements IDragAndDrop {
     public void setPlacedObjImg(Skin skin, String drawable){
         this.placedCraftingCard.setDrawable(skin, drawable);
     }
-
+    public void setPlacedObjImg(Drawable drawable){
+        this.placedCraftingCard.setDrawable(drawable);
+    }
     public CardActor getBuildingCardActor() {
         return buildingCardActor;
     }

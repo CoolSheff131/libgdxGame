@@ -1,4 +1,4 @@
-package com.mygdx.game.gamescreen;
+package com.mygdx.game.gamescreen.craft;
 
 import com.mygdx.game.gamescreen.cards.Items;
 

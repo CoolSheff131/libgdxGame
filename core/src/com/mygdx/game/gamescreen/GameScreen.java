@@ -2,7 +2,6 @@ package com.mygdx.game.gamescreen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -25,68 +24,22 @@ import com.mygdx.game.LevelManager;
 import com.mygdx.game.MainMenuScreen;
 import com.mygdx.game.MediaPlayer;
 import com.mygdx.game.MotherBoardCard;
+import com.mygdx.game.TextureLoader;
 import com.mygdx.game.gamescreen.cards.CardActor;
 import com.mygdx.game.gamescreen.cards.Factory;
 import com.mygdx.game.gamescreen.cards.Items;
 import com.mygdx.game.gamescreen.cells.CellActor;
 import com.mygdx.game.gamescreen.cells.CraftingCellActor;
 import com.mygdx.game.gamescreen.cells.FieldCellActor;
+import com.mygdx.game.gamescreen.craft.CraftingSystem;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 public class GameScreen implements Screen {
 	private MotherBoardCard game;
 	private OrthographicCamera camera;
- 	public static Skin skin;
- 	static{//загрузка текстур
-		skin = new Skin();
-		skin.add("fieldCell", new Texture("sprites/FieldCellImg.png"));
-		skin.add("badlogic", new Texture("heart.png"));
-		skin.add("coem", new Texture("sprites/coem.png"));
-		skin.add("res", new Texture("sprites/resourceImg.png"));
-		skin.add("scheme", new Texture("sprites/schemeImg.png"));
-		skin.add("worker", new Texture("sprites/workerImg.png"));
+ 	public static Skin skin = TextureLoader.getSkin();
 
-		skin.add("BuildR", new Texture("sprites/BuildRes.png"));
-		skin.add("BuildRSch", new Texture("sprites/SchemeRes.png"));
-		skin.add("BuildS", new Texture("sprites/BuildScheme.png"));
-		skin.add("BuildSSch", new Texture("sprites/SchemeSch.png"));
-		skin.add("BuildW", new Texture("sprites/BuildWorker.png"));
-		skin.add("BuildWSch", new Texture("sprites/SchemeWork.png"));
-		skin.add("BuildEn", new Texture("sprites/BuildEn.png"));
-		skin.add("BuildEnSch", new Texture("sprites/SchemeEn.png"));
-
-		skin.add("exit", new Texture("sprites/ButtonHome.png"));
-		skin.add("exitPressed", new Texture("sprites/ButtonHomePressed.png"));
-		skin.add("restart", new Texture("sprites/ButtonRestart.png"));
-		skin.add("restartPressed", new Texture("sprites/ButtonRestartPressed.png"));
-
-		skin.add("pause", new Texture("sprites/ButtonPause.png"));
-		skin.add("pausePressed", new Texture("sprites/ButtonPausePressed.png"));
-
-		skin.add("left", new Texture("sprites/ButtonLeftArrow.png"));
-		skin.add("leftPressed", new Texture("sprites/ButtonLeftArrowPressed.png"));
-		skin.add("right", new Texture("sprites/ButtonRightArrow.png"));
-		skin.add("rightPressed", new Texture("sprites/ButtonRightArrowPressed.png"));
-
-		skin.add("craft", new Texture("sprites/ButtonCraft.png"));
-		skin.add("craftPressed", new Texture("sprites/ButtonCraftPressed.png"));
-
-		skin.add("power", new Texture("sprites/ButtonPower.png"));
-		skin.add("powerPressed", new Texture("sprites/ButtonPowerPressed.png"));
-		skin.add("resume", new Texture("sprites/ButtonPlay.png"));
-		skin.add("resumePressed", new Texture("sprites/ButtonPlayPressed.png"));
-		skin.add("next", new Texture("sprites/ButtonNext.png"));
-		skin.add("nextPressed", new Texture("sprites/ButtonNextPressed.png"));
-		skin.add("bgn", new Texture("sprites/BgnMother.png"));
-		skin.add("bgnInfo", new Texture("sprites/BgnInfo.png"));
-		skin.add("craftM", new Texture("sprites/CraftMachine.png"));
-		skin.add("wood", new Texture("sprites/Wood.png"));
-		skin.add("craftCell", new Texture("sprites/CraftingCell.png"));
-		skin.add("quickBuild", new Texture("sprites/quickBuild.png"));
-		skin.add("demolishBuild", new Texture("sprites/demolishBuild.png"));
-		skin.add("activateBuild", new Texture("sprites/activateBuild.png"));
-	}
 
 	private Stage stage;
 
@@ -108,7 +61,9 @@ public class GameScreen implements Screen {
 	public static FieldCellActor[][] getFieldCells(){
 		return fieldCells;
 	}
-	private Image backgroundField,craftMachineImg,woodenTable;
+
+	private Image craftMachineImg;
+	private Image woodenTable;
 
 	public static void addEn(int en){
 		energy+=en;
@@ -255,7 +210,7 @@ public class GameScreen implements Screen {
 	private void init(){
 		WIDTH_SCREEN = MotherBoardCard.getWidthScreen();
 		HEIGHT_SCREEN = MotherBoardCard.getHeightScreen();
-		backgroundField = new Image(skin,"bgn");
+		Image backgroundField = new Image(skin, "bgn");
 		craftMachineImg = new Image(skin,"craftM");
 		woodenTable = new Image(skin,"wood");
 		energy = 0;

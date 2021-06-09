@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.mygdx.game.gamescreen.GameScreen;
+import com.mygdx.game.gamescreen.craft.CraftingBook;
 
 import java.util.ArrayList;
 
@@ -67,6 +68,7 @@ public class MainMenuScreen implements Screen {
         parameter.size = 40;
         lblfont = generator.generateFont(parameter);
         parameter.size = 10;
+
         smallFont = generator.generateFont(parameter);
         generator.dispose();
         textButtonStyle.font = font;
@@ -178,6 +180,7 @@ public class MainMenuScreen implements Screen {
         stage.addActor(mainMenu);
         stage.addActor(levels);
         stage.addActor(options);
+        stage.addActor(new CraftingBook(600,600));
     }
 
     private void setBtnListerners() {
