@@ -44,7 +44,7 @@ public class Factory {
             @Null
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
 
-//                Singleton.getDragAndDrop().setDragActorPosition(0,0);
+                Singleton.getDragAndDrop().setDragActorPosition(0,0);
                 return ((IDragAndDrop)getActor()).dragStart();
             }
             @Override

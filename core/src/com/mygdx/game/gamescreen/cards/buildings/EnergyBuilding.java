@@ -5,7 +5,7 @@ import com.mygdx.game.gamescreen.cards.Items;
 
 public class EnergyBuilding extends Building{
     public EnergyBuilding() {
-        super("BuildEn","BuildEn",2);
+        super("BuildEn","BuildEn",2,"Adds En");
     }
 
     @Override

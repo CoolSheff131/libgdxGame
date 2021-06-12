@@ -6,7 +6,7 @@ import com.mygdx.game.gamescreen.cards.Factory;
 
 public class WorkerBuilding extends Building {
     public WorkerBuilding() {
-        super("BuildW","BuildW");
+        super("BuildW","BuildW","Adds W resource");
     }
 
     @Override

@@ -13,8 +13,8 @@ public abstract class Upgrade extends CardActor {
 
 
 
-    public Upgrade(String drawableName, String name) {
-        super(drawableName, name);
+    public Upgrade(String drawableName, String name,String description) {
+        super(drawableName, name,description);
     }
 
     @Override

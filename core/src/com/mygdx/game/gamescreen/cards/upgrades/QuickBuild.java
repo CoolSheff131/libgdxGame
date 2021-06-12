@@ -6,7 +6,7 @@ import com.mygdx.game.gamescreen.cards.buildings.Building;
 public class QuickBuild extends Upgrade{
 
     public QuickBuild() {
-        super("quickBuild", "quickBuild");
+        super("quickBuild", "quickBuild","build circuite");
     }
 
 

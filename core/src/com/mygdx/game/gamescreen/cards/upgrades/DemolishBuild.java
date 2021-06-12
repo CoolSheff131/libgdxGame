@@ -6,7 +6,7 @@ import com.mygdx.game.gamescreen.cards.buildings.Building;
 public class DemolishBuild extends Upgrade{
 
     public DemolishBuild() {
-            super("demolishBuild", "demolishBuild");
+            super("demolishBuild", "demolishBuild","Demolishes circuite");
         }
 
 

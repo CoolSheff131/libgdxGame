@@ -3,6 +3,7 @@ package com.mygdx.game.gamescreen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.mygdx.game.TextureLoader;
 import com.mygdx.game.gamescreen.cards.CardActor;
 import com.mygdx.game.gamescreen.cards.CardFamily;
 import com.mygdx.game.gamescreen.cards.buildings.Building;
@@ -10,7 +11,7 @@ import com.mygdx.game.gamescreen.cards.upgrades.Upgrade;
 import com.mygdx.game.gamescreen.cells.CellActor;
 import com.mygdx.game.gamescreen.cells.FieldCellActor;
 
-import static com.mygdx.game.gamescreen.GameScreen.skin;
+
 
 public class FieldTarget extends DragAndDrop.Target {
     private CellActor[][] fieldCells;
@@ -45,7 +46,7 @@ public class FieldTarget extends DragAndDrop.Target {
     public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float v, float v1, int i) {
         CardActor cardActor = (CardActor) payload.getDragActor();
         if (cardActor.getFamilyType() == CardFamily.BUILDING) {
-            ((CellActor) getActor()).setPlacedObjImg(skin, ((CardActor) payload.getDragActor()).getDrawableName());//устанавливаем картинку поставленной картинки
+            ((CellActor) getActor()).setPlacedObjImg(TextureLoader.getSkin(), ((CardActor) payload.getDragActor()).getDrawableName());//устанавливаем картинку поставленной картинки
             ((Building) (payload.getDragActor())).setOccupiedCell((FieldCellActor) getActor());
             ((CellActor) getActor()).setBuildingCardActor(((CardActor) payload.getDragActor()));    //устанавливаем карту
             ((FieldCellActor) getActor()).setBuilding((Building) payload.getDragActor());        //устанавливаем постройку

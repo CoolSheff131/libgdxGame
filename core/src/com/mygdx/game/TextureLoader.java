@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.mygdx.game.gamescreen.Characters;
 import com.mygdx.game.gamescreen.cards.Items;
 
 public class TextureLoader {
@@ -61,6 +62,8 @@ public class TextureLoader {
 
         skin.add("bookBtn", new Texture("sprites/ButtonBook.png"));
         skin.add("bookBtnPressed", new Texture("sprites/ButtonBookPressed.png"));
+        skin.add("bgnDialog", new Texture("sprites/BgnDialog.png"));
+        skin.add("Tolya", new Texture("sprites/TolyaImg.png"));
     }
     public static Skin getSkin(){
         return skin;
@@ -68,6 +71,12 @@ public class TextureLoader {
 
     public static Drawable getDrawable(String drawableName){
         return skin.getDrawable(drawableName);
+    }
+    public static Drawable getDrawable(Characters character){
+        switch (character){
+            case Tolya: return skin.getDrawable("Tolya");
+        }
+        return skin.getDrawable("wood");
     }
     public static Drawable getDrawable(Items item){
         switch (item){

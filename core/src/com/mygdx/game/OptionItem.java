@@ -17,7 +17,7 @@ public class OptionItem extends Group {
     }
 
     public OptionItem(String text){
-        label = new Label(text,new Label.LabelStyle(FontManager.getFont(40), Color.WHITE));
+        label = new Label(text,new Label.LabelStyle(FontManager.getFontK(40), Color.WHITE));
         button = new Button(checkBtnStyle);
         addActor(label);
         addActor(button);

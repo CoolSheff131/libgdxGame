@@ -6,7 +6,7 @@ import com.mygdx.game.gamescreen.cards.Factory;
 
 public class SchemeBuilding extends Building {
     public SchemeBuilding() {
-        super("BuildS","BuildS");
+        super("BuildS","BuildS","Adds S resource");
     }
 
     @Override

@@ -1,30 +1,36 @@
 package com.mygdx.game.gamescreen.cards.buildings;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.mygdx.game.FontManager;
+import com.mygdx.game.TextureLoader;
 import com.mygdx.game.gamescreen.Singleton;
 import com.mygdx.game.gamescreen.cards.CardActor;
 import com.mygdx.game.gamescreen.cards.CardFamily;
 import com.mygdx.game.gamescreen.cells.FieldCellActor;
 
 
-import static com.mygdx.game.gamescreen.GameScreen.skin;
 
 public abstract class Building extends CardActor {
     protected boolean isBuilded;
     private FieldCellActor occupiedCell;
     private String buildedName;
     private int buildTurns;
-    public Building(String name,String buildedName) {
-        super(buildedName,name);
-        this.buildedName = buildedName;
-        isBuilded = false;
-        buildTurns = 1;
+    private Label buildTurnsLabel;
+    public Building(String name,String buildedName,String description) {
+        this(name,buildedName,1,description);
     }
-    public Building(String name,String buildedName, int buildTurns) {
-        super(buildedName,name);
+    public Building(String name,String buildedName, int buildTurns,String description) {
+        super(buildedName,name,description);
         this.buildedName = buildedName;
         isBuilded = false;
         this.buildTurns = buildTurns;
+
+
+        buildTurnsLabel = new Label(String.valueOf(buildTurns),new Label.LabelStyle(FontManager.getFontJoystix(10), Color.WHITE));
+        buildTurnsLabel.setPosition(getWidth()/20,getHeight()/20);
+        addActor(buildTurnsLabel);
     }
     public void setOccupiedCell(FieldCellActor occupiedCell) {
         this.occupiedCell = occupiedCell;
@@ -52,7 +58,7 @@ public abstract class Building extends CardActor {
         if(buildTurns ==0) {
             isBuilded = true;
             if (occupiedCell != null) {
-                occupiedCell.setPlacedObjImg(skin, buildedName);
+                occupiedCell.setPlacedObjImg(TextureLoader.getSkin(), buildedName);
                 Singleton.getDragAndDrop().removeSource(occupiedCell.getSource());//Убираем возможность перетаскивать построенной
             }
         }

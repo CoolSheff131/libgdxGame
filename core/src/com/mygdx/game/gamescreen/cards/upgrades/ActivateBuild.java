@@ -6,7 +6,7 @@ import com.mygdx.game.gamescreen.cards.buildings.Building;
 public class ActivateBuild extends Upgrade{
 
     public ActivateBuild() {
-        super("activateBuild", "activatehBuild");
+        super("activateBuild", "activatehBuild","Activate circuit");
     }
 
 

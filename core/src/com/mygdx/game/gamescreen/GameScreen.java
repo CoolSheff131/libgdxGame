@@ -26,12 +26,13 @@ import com.mygdx.game.gamescreen.cards.Factory;
 import com.mygdx.game.gamescreen.cards.Items;
 import com.mygdx.game.gamescreen.craft.CraftingBook;
 
+import java.util.ArrayList;
+
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 public class GameScreen implements Screen {
 	private MotherBoardCard game;
 	private OrthographicCamera camera;
- 	public static Skin skin = TextureLoader.getSkin();//todo Изаваться от этого
 	private Stage stage;
 	private Button pauseBtn, exitBtn, restartBtn,toWorkshopBtn, endTurnBtn,craftBtn,nextLvlBtn, craftingBookBtn;
 	private Label turnLabel, enLabel, endLabel;
@@ -46,12 +47,39 @@ public class GameScreen implements Screen {
 	private Image craftMachineImg, woodenTable;
 	private CraftingBook craftingBook;
 	private Hand buildHand;
+	private Dialog dialog;
 	public static void addEn(int en){
 		energy+=en;
 	}
 	public GameScreen (MotherBoardCard game,LevelInfo levelInfo) {
 		this.levelInfo = levelInfo;
 		this.game = game;
+		ArrayList<String> arrayList = new ArrayList<>();
+		switch (levelInfo.getType()){
+			case Tutorial:
+				arrayList.add("Hello, My name is Tolya.");
+				arrayList.add("I'm going to teach you how to play.");
+				arrayList.add("The main goal of the level is to \nsatisfy the needs of the\nowner of this computer \nin a limited number of moves.");
+
+				arrayList.add("To do this, you have building cards\nand a field with cells\non which to place them.");
+				arrayList.add("This is done very simply. just drag\nthe card to the slot\nwhere you want to place it.");
+				arrayList.add("When you do this, a diagram of this\nbuilding will appear on the cell.");
+				arrayList.add("While this is just a scheme, you\ncan transfer it to another\ncell or return a card to your hand.");
+				arrayList.add("When you press the power button,\nthe motherboard will start building\ncircuits and you will no longer be\nable to move them.");
+				arrayList.add("And the built circuits will do their thing.");
+				arrayList.add("An important aspect is the assembly\nof the circuits in the workshop.");
+				arrayList.add("There is a separate place for resources\nin the workshop.");
+				arrayList.add("There is also a book of\nrecipes available.");
+				arrayList.add("The circuit assembly\nprocess is very simple.");
+				arrayList.add("Drag the resources to the crafting\nslots and when you collect\nthe desired recipe, press the build button");
+				arrayList.add("Like I said everything, good luck");
+
+			case En:
+
+		}
+
+
+		dialog = new Dialog(Characters.Tolya,arrayList,MotherBoardCard.getWidthScreen(), MotherBoardCard.getHeightScreen());
 		init();
 		setBtnListeners();
 		stage.addActor(fieldGroup);
@@ -59,6 +87,9 @@ public class GameScreen implements Screen {
 		stage.addActor(toWorkshopBtn);
 		stage.addActor(info);
 		stage.addActor(buildHand);
+
+		stage.addActor(dialog);
+
 		restart();
 	}
 	private void setBtnListeners(){
@@ -70,12 +101,12 @@ public class GameScreen implements Screen {
 					endLabel.setText("PAUSE");
 					stage.addActor(endGroup);
 					onPause =!onPause;
-					pauseBtn.getStyle().up = skin.getDrawable("resume");
-					pauseBtn.getStyle().down = skin.getDrawable("resumePressed");
+					pauseBtn.getStyle().up = TextureLoader.getDrawable("resume");
+					pauseBtn.getStyle().down = TextureLoader.getDrawable("resumePressed");
 				}else{
 					endGroup.remove();
-					pauseBtn.getStyle().up = skin.getDrawable("pause");
-					pauseBtn.getStyle().down = skin.getDrawable("pausePressed");
+					pauseBtn.getStyle().up = TextureLoader.getDrawable("pause");
+					pauseBtn.getStyle().down = TextureLoader.getDrawable("pausePressed");
 					onPause =!onPause;
 				}
 				return super.touchDown(event, x, y, pointer, button);
@@ -150,15 +181,15 @@ public class GameScreen implements Screen {
 					fieldGroup.addAction(moveBy(WIDTH_SCREEN,0,0.2f));
 					workshopGroup.addAction(moveBy(WIDTH_SCREEN,0,0.2f));
 					inFields = !inFields;
-					toWorkshopBtn.getStyle().up = skin.getDrawable("right");
-					toWorkshopBtn.getStyle().down = skin.getDrawable("rightPressed");
+					toWorkshopBtn.getStyle().up = TextureLoader.getDrawable("right");
+					toWorkshopBtn.getStyle().down = TextureLoader.getDrawable("rightPressed");
 				}
 				else{
 					fieldGroup.addAction(moveBy(-WIDTH_SCREEN,0,0.2f));
 					workshopGroup.addAction(moveBy(-WIDTH_SCREEN,0,0.2f));
 					inFields = !inFields;
-					toWorkshopBtn.getStyle().up = skin.getDrawable("left");
-					toWorkshopBtn.getStyle().down = skin.getDrawable("leftPressed");
+					toWorkshopBtn.getStyle().up = TextureLoader.getDrawable("left");
+					toWorkshopBtn.getStyle().down = TextureLoader.getDrawable("leftPressed");
 				}
 				return super.touchDown(event, x, y, pointer, button);
 			}
@@ -192,7 +223,7 @@ public class GameScreen implements Screen {
 	private void init(){
 		WIDTH_SCREEN = MotherBoardCard.getWidthScreen();
 		HEIGHT_SCREEN = MotherBoardCard.getHeightScreen();
-		Image backgroundField = new Image(skin, "bgn");
+		Image backgroundField = new Image(TextureLoader.getSkin(), "bgn");
 		energy = 0;
 		backgroundField.setSize(WIDTH_SCREEN,HEIGHT_SCREEN);
 		int HEIGHT_HAND,HEIGH_FIELD,HEIGHT_INFO,PADDING,WIDTH_BUTTON;
@@ -282,7 +313,7 @@ public class GameScreen implements Screen {
 		int btnMenu_size = WIDTH_MENU/5;
 		int paddingMenu = WIDTH_MENU/10;
 		menuPanel.setBounds(WIDTH_SCREEN/6,0,WIDTH_MENU,HEIGHT_MENU);
-		endLabel = new Label("ERROR",new Label.LabelStyle(FontManager.getFont(100),Color.BLACK));
+		endLabel = new Label("ERROR",new Label.LabelStyle(FontManager.getFontK(100),Color.BLACK));
 		endGroup.addActor(menuPanel);
 		endGroup.addActor(exitBtn);
 		endGroup.addActor(restartBtn);
@@ -298,11 +329,11 @@ public class GameScreen implements Screen {
 		info =  new Group();
 
 		pauseBtn.setBounds(0,0,HEIGHT_INFO,HEIGHT_INFO);
-		turnLabel = new Label("Turn: "+ turn+"/"+levelInfo.getMaxTurn(),new Label.LabelStyle(FontManager.getFont(40),Color.BLACK));
-		enLabel = new Label("en: "+ energy+"/"+levelInfo.getNeedResources(),new Label.LabelStyle(FontManager.getFont(40),Color.BLACK));
+		turnLabel = new Label("Turn: "+ turn+"/"+levelInfo.getMaxTurn(),new Label.LabelStyle(FontManager.getFontK(40),Color.BLACK));
+		enLabel = new Label("en: "+ energy+"/"+levelInfo.getNeedResources(),new Label.LabelStyle(FontManager.getFontK(40),Color.BLACK));
 		turnLabel.setBounds(HEIGHT_INFO + PADDING,0,WIDTH_SCREEN/5,HEIGHT_INFO);
 		enLabel.setBounds(HEIGHT_INFO + PADDING+WIDTH_SCREEN/5+PADDING,0,WIDTH_SCREEN/5,HEIGHT_INFO);
-		Image bgn = new Image(skin,"bgnInfo");
+		Image bgn = new Image(TextureLoader.getSkin(),"bgnInfo");
 		bgn.setSize(WIDTH_SCREEN,HEIGHT_INFO);
 		info.addActor(bgn);
 		info.addActor(turnLabel);
@@ -324,8 +355,8 @@ public class GameScreen implements Screen {
 	private void restart(){
 		pauseBtn.setTouchable(Touchable.enabled);
 //		Singleton.getDragAndDrop().clear();todo исправить убираются таргеты с крафтовых но не возвращаются
-		pauseBtn.getStyle().up = skin.getDrawable("pause");
-		pauseBtn.getStyle().down = skin.getDrawable("pausePressed");
+		pauseBtn.getStyle().up = TextureLoader.getDrawable("pause");//todo баг при перезаходе на уровень с меню все пропадает и лагает все
+		pauseBtn.getStyle().down = TextureLoader.getDrawable("pausePressed");
 		onPause = false;
 
 		energy = 0;

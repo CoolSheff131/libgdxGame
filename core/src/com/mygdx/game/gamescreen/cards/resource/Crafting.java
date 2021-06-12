@@ -11,7 +11,7 @@ public abstract class Crafting extends CardActor {
 
 
     public Crafting(String drawableName, String name) {
-        super(drawableName, name);
+        super(drawableName, name,"");
     }
 
     @Override
