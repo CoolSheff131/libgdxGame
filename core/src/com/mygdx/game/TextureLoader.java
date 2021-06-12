@@ -58,6 +58,9 @@ public class TextureLoader {
         skin.add("quickBuild", new Texture("sprites/quickBuild.png"));
         skin.add("demolishBuild", new Texture("sprites/demolishBuild.png"));
         skin.add("activateBuild", new Texture("sprites/activateBuild.png"));
+
+        skin.add("bookBtn", new Texture("sprites/ButtonBook.png"));
+        skin.add("bookBtnPressed", new Texture("sprites/ButtonBookPressed.png"));
     }
     public static Skin getSkin(){
         return skin;

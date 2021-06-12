@@ -35,7 +35,6 @@ public class MainMenuScreen implements Screen {
     private ArrayList<OptionItem> optionItems;
     private Label menuLabel,levelLabel, optionLabel,gameLabel;
     private Skin skin;
-    public static BitmapFont lblfont,bigFont,smallFont;
     protected static TextButton.TextButtonStyle checkBtnStyle, textButtonStyle;
     private int WIDTH_SCREEN, HEIGHT_SCREEN;
     private TextButton backOption,backLevel;
@@ -57,21 +56,13 @@ public class MainMenuScreen implements Screen {
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/k.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 100;
-        bigFont = generator.generateFont(parameter);
-        gameLabel = new Label("MotherBoardCard",new Label.LabelStyle(bigFont, Color.WHITE));
+
+        gameLabel = new Label("MotherBoardCard",new Label.LabelStyle(FontManager.getFont(100), Color.WHITE));
         gameLabel.setPosition(WIDTH_SCREEN/2-gameLabel.getWidth()/2,HEIGHT_SCREEN/8*7);
-        parameter.size = 20;
 
         textButtonStyle = new TextButton.TextButtonStyle();
-        BitmapFont font = generator.generateFont(parameter);
-        parameter.size = 40;
-        lblfont = generator.generateFont(parameter);
-        parameter.size = 10;
-
-        smallFont = generator.generateFont(parameter);
         generator.dispose();
-        textButtonStyle.font = font;
+        textButtonStyle.font = FontManager.getFont(20);
         textButtonStyle.fontColor = Color.BLACK;
 
         textButtonStyle.up = skin.getDrawable("up");
@@ -102,7 +93,7 @@ public class MainMenuScreen implements Screen {
             i++;
             mainMenu.addActor(button);
         }
-        menuLabel = new Label("MAIN MENU ",new Label.LabelStyle(lblfont, Color.WHITE));
+        menuLabel = new Label("MAIN MENU ",new Label.LabelStyle(FontManager.getFont(40), Color.WHITE));
         mainMenu.addActor(menuLabel);
         menuLabel.setPosition(WIDTH_SCREEN/2-menuLabel.getWidth()/2,HEIGHT_SCREEN/8*6);
 
@@ -116,7 +107,7 @@ public class MainMenuScreen implements Screen {
         backLevel = new TextButton("Back",textButtonStyle);
         backLevel.setBounds(WIDTH_SCREEN/2-BUTTON_WIDTH/2,BUTTON_HEIGHT,BUTTON_WIDTH,BUTTON_HEIGHT);
         levels.addActor(backLevel);
-        levelLabel = new Label("LEVELS",new Label.LabelStyle(lblfont, Color.WHITE));
+        levelLabel = new Label("LEVELS",new Label.LabelStyle(FontManager.getFont(40), Color.WHITE));
         levels.addActor(levelLabel);
         levelLabel.setPosition(WIDTH_SCREEN/2-levelLabel.getWidth()/2,HEIGHT_SCREEN/8*7);
         choosLvlBtn = new ArrayList<>();
@@ -166,7 +157,7 @@ public class MainMenuScreen implements Screen {
             i++;
             options.addActor(button);
         }
-        optionLabel = new Label("OPTIONS",new Label.LabelStyle(lblfont, Color.WHITE));
+        optionLabel = new Label("OPTIONS",new Label.LabelStyle(FontManager.getFont(40), Color.WHITE));
         backOption.setBounds(WIDTH_SCREEN/2-BUTTON_WIDTH/2,BUTTON_HEIGHT,BUTTON_WIDTH,BUTTON_HEIGHT);
         options.addActor(backOption);
         options.addActor(optionLabel);
@@ -180,7 +171,7 @@ public class MainMenuScreen implements Screen {
         stage.addActor(mainMenu);
         stage.addActor(levels);
         stage.addActor(options);
-        stage.addActor(new CraftingBook(600,600));
+
     }
 
     private void setBtnListerners() {

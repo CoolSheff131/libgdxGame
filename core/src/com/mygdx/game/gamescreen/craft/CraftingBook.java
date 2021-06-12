@@ -10,23 +10,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.mygdx.game.MainMenuScreen;
-import com.mygdx.game.MotherBoardCard;
+import com.mygdx.game.MediaPlayer;
 import com.mygdx.game.TextureLoader;
-import com.mygdx.game.gamescreen.GameScreen;
-import com.mygdx.game.gamescreen.Singleton;
-import com.mygdx.game.gamescreen.cards.Factory;
 import com.mygdx.game.gamescreen.cards.Items;
-import com.mygdx.game.gamescreen.cells.CellActor;
-import com.mygdx.game.gamescreen.cells.CraftingCellActor;
-import com.sun.org.apache.bcel.internal.generic.FLOAD;
 
 import java.util.ArrayList;
 
 public class CraftingBook extends Group {
     private Table craft,cards;
     private Button next,prev,back;
-    private Button[] cardsImage;
+    private Button[] cardsBtns;
 
     private int page, pageSize;
     private ArrayList<Recipe> recipesPage;
@@ -42,7 +35,7 @@ public class CraftingBook extends Group {
         Image menuPanel = new Image( new Texture("sprites/menuPanel.png"));
         recipesPage = new ArrayList<>();
         craftingImage = new Image[3];
-        cardsImage = new Button[4];
+        cardsBtns = new Button[4];
 
         menuPanel.setBounds(0,0,width,height);
         addActor(menuPanel);
@@ -64,52 +57,47 @@ public class CraftingBook extends Group {
         back.setBounds(width/3,0,width/3,height/5);
         next.setBounds(width/3*2,0,width/3,height/5);
 
-
         cards.setBounds(0,height/5,width,height/5*2);
         craft.setBounds(0,height/5*3,width,height/5*2);
 
-
-        for (int i = 0; i < cardsImage.length ; i++) {
-            cardsImage[i] = new Button();
-            cardsImage[i].setStyle(new Button.ButtonStyle());
-            cardsImage[i].getStyle().up = TextureLoader.getDrawable("wood");
+        for (int i = 0; i < cardsBtns.length ; i++) {
+            cardsBtns[i] = new Button();
+            cardsBtns[i].setStyle(new Button.ButtonStyle());
+            cardsBtns[i].getStyle().up = TextureLoader.getDrawable("craftCell");
             final int finalI = i;
-            cardsImage[i].addListener(new InputListener(){
+            cardsBtns[i].addListener(new InputListener(){
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    MediaPlayer.playBtn();
                     showCraft(finalI);
                     return super.touchDown(event, x, y, pointer, button);
                 }
             });
-
             if(i%2==0)
                 cards.row();
-            cards.add(cardsImage[i]).grow();
+            cards.add(cardsBtns[i]).grow();
         }
-
-
         for (int i = 0; i < craftingImage.length ; i++) {
             craftingImage[i] = new Image();
-            craftingImage[i].setDrawable(TextureLoader.getDrawable("wood"));
+            craftingImage[i].setDrawable(TextureLoader.getDrawable("craftCell"));
             craft.add(craftingImage[i]).grow();
         }
-
-
         pageSize = 4;
-
         next.addListener(new InputListener(){
+
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                MediaPlayer.playBtn();
                 clearCraft();
                 loadCrafts(true);
                 checkBtns();
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
-
         prev.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                MediaPlayer.playBtn();
                 clearCraft();
                 loadCrafts(false);
                 checkBtns();
@@ -119,11 +107,11 @@ public class CraftingBook extends Group {
         back.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                MediaPlayer.playBtn();
                 setVisible(false);
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
-
         addActor(next);
         addActor(prev);
         addActor(back);
@@ -132,6 +120,7 @@ public class CraftingBook extends Group {
         checkBtns();
         page--;
         loadCrafts(true);
+        setVisible(false);
     }
     public void show(){
         setVisible(true);
@@ -142,18 +131,18 @@ public class CraftingBook extends Group {
             Recipe recipe = recipesPage.get(i);
             Items[] craft = recipe.getRecipe();
 
-            cardsImage[i].setColor(Color.GRAY);//помечаем выбранную карту
+            cardsBtns[i].setColor(Color.GRAY);//помечаем выбранную карту
             for (int j = 0; j < craft.length; j++) {//Загружаем рецепт в ячейки
                 craftingImage[j].setDrawable(TextureLoader.getDrawable(craft[j]));
             }
         }
     }
     private void clearCraft(){
-        for (Button card : cardsImage) {//очищаем все карты
+        for (Button card : cardsBtns) {//очищаем все карты
             card.setColor(Color.WHITE);
         }
         for (int j = 0; j < craftingImage.length; j++) {//Загружаем рецепт в ячейки
-            craftingImage[j].setDrawable(TextureLoader.getDrawable("wood"));
+            craftingImage[j].setDrawable(TextureLoader.getDrawable("craftCell"));
         }
     }
     private void checkBtns(){
@@ -168,10 +157,9 @@ public class CraftingBook extends Group {
     }
     private void loadCrafts(boolean next){
         recipesPage.clear();
-        for (Button cell: cardsImage) {
-            cell.getStyle().up = TextureLoader.getDrawable("wood");;
+        for (Button cell: cardsBtns) {
+            cell.getStyle().up = TextureLoader.getDrawable("craftCell");;
         }
-
         if(next && page < CraftingSystem.getRecipes().size() /4){
             page++;
         }else if(!next && page>0){
@@ -180,17 +168,11 @@ public class CraftingBook extends Group {
         for (int i = 0; i < pageSize && pageSize*page + i < CraftingSystem.getRecipes().size() ; i++) {
             recipesPage.add(CraftingSystem.getRecipes().get(pageSize*page + i));
         }
-
         for (int i = 0;i<recipesPage.size();i++ ) {
             Recipe recipe= recipesPage.get(i);
             Items result =  recipe.getOut();
             Drawable drawableResult = TextureLoader.getDrawable(result);
-            cardsImage[i].getStyle().up = (drawableResult);
+            cardsBtns[i].getStyle().up = (drawableResult);
         }
-
-
     }
-
-
-
 }

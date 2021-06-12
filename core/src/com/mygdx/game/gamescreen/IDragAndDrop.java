@@ -4,8 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 
 public interface IDragAndDrop {
     public abstract DragAndDrop.Payload dragStart();
-    public abstract void dragStop(DragAndDrop.Payload payload);
-    public abstract boolean canDrop();
-    public abstract void drop();
+    public abstract void noTargetAction(DragAndDrop.Payload payload);
+
 
 }
